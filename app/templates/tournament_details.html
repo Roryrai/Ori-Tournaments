@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+<h1>{{ tournament.name }}</h1>
+<h3>Entrants</h3>
+{% for entrant in tournament.entrants %}
+    {{ entrant.user.username }}<br />
+{% endfor %}
+{% endblock %}

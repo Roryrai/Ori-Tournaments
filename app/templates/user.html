@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+<table class="table table-hover">
+    <tr>
+        <td>
+            <h1>{{ user.username }}</h1>
+        </td>
+    </tr>
+</table>
+{% for race in user.races %}
+<p>
+    race.date, race.time
+</p>
+{% else %}
+<p>
+    This user has no race history
+</p>
+{% endfor %}
+{% endblock %}

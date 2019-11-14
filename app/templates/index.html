@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+    {% if tournaments %}
+        {% for tournament in tournaments %}
+            <h1>{{tournament.name}} - {{ tournament.id }}</h1>
+            {% if tournament.registration_open() %}
+                <p>
+                    Registration for the {{tournament.name}} tournament is now open!
+                </p>
+                {% if not current_user.is_anonymous and not current_user.is_registered(tournament.id) %}
+                    <a class="btn btn-primary" href="{{url_for('register', tournament_id=tournament.id)}}">Sign Up</a>
+                {% else %}
+                    <p>You have signed up for this event.</p>
+                    <a class="btn btn-danger" href="{{ url_for('withdraw_registration', tournament_id=tournament.id) }}">Withdraw Registration</a>
+                {% endif %}
+            {% else %}
+                <p>
+                    The {{ tournament.name }} tournament is currently active.
+                </p>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+    <p>
+        No tournaments are active at this time.
+    </p>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+
+{% if not current_user.is_anonymous and current_user.is_organizer() %}
+<a href="{{ url_for('create_tournament') }}" class="btn btn-default">Create Tournament</a>
+<h2>Planned Tournaments</h2>
+{% for tournament in planned %}
+<p>
+    <a href="{{ url_for('tournament_details', tournament_id=tournament.id) }}">{{ tournament.name }}</a>
+</p>
+{% endfor %}
+{% endif %}
+<h2>Active tournaments</h2>
+{% for tournament in tournaments %}
+<p>
+    <a href="{{ url_for('tournament_details', tournament_id=tournament.id) }}">{{ tournament.name }}</a>
+</p>
+{% endfor %}
+
+<h2>Past tournaments</h2>
+{% for tournament in history %}
+<p>
+    <a href="{{ url_for('tournament_details', tournament_id=tournament.id) }}">{{ tournament.name }}</a>
+</p>
+{% endfor %}
+
+{% endblock %}
