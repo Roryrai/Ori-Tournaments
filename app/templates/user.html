@@ -1,20 +1,148 @@
 {% extends "base.html" %}
 
 {% block app_content %}
-<table class="table table-hover">
+<table class="table borderless">
     <tr>
         <td>
             <h1>{{ user.username }}</h1>
+            {% if user.is_organizer() %}
+            <p>Tournament Organizer</p>
+            {% endif %}
         </td>
     </tr>
 </table>
-{% for race in user.races %}
-<p>
-    race.date, race.time
-</p>
-{% else %}
-<p>
-    This user has no race history
-</p>
-{% endfor %}
+
+{% if user.is_runner() or user.is_volunteer() %}
+<ul class="nav nav-tabs">
+    <li class="active">
+        <a data-toggle="tab" href="#profile">Profile</a>
+    </li>
+    {% if user.is_runner() %}
+    <li>
+        <a data-toggle="tab" href="#runner">Runner Info</a>
+    </li>
+    <li>
+        <a data-toggle="tab" href="#race_history">Race History</a>
+    </li>
+    {% endif %}
+    {% if user.is_volunteer() %}
+    <li>
+        <a data-toggle="tab" href="#volunteer">Volunteer Info</a>
+    </li>
+    {% endif %}
+</ul>
+{% endif %}
+
+<div class="tab-content">
+    <!-- General profile information -->
+    <div id="profile" class="col-xs-6 tab-pane fade in active">
+        <table class="table borderless">
+            <tr>
+                <td><strong>Discord Name</strong></td>
+                <td>{{ user.discord_name }}</a></td>
+            </tr>
+            <tr>
+                <td>
+                    <Strong>Preferred Pronouns</Strong>
+                </td>
+                <td>
+                    {{ user.pronouns }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <Strong>About</Strong>
+                </td>
+                <td>
+                    {{ user.interesting_facts }}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Runner profile information -->
+    <div id="runner" class="col-xs-6 tab-pane fade in">
+        <table class="table borderless">
+            <tr>
+                <td><strong>Twitch Name</strong></td>
+                <td><a href="{{ 'https://twitch.tv/%s' % user.runner_info.twitch_name }}">{{ user.runner_info.twitch_name }}</a></td>
+            </tr>
+            <tr>
+                <td>
+                    <Strong>Speedrun.com username</Strong>
+                </td>
+                <td>
+                    {{ user.runner_info.src_name }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <Strong>SpeedRunsLive username</Strong>
+                </td>
+                <td>
+                    {{ user.runner_info.srl_name }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <Strong>Input Method</Strong>
+                </td>
+                <td>
+                    {{ user.runner_info.input_method }}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Race Information -->
+    <div id="race_history" class="col-xs-6 tab-pane fade in">
+        <table class="table borderless">
+            {% if user.race_results %}
+            {% for result in user.race_results %}
+            <tr>
+                <td>
+                    {{result.race.date}}, {{result.time}}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td>
+                    <p>This user has no race history recorded.</p>
+                </td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+        </table>
+    </div>
+
+    <!-- Volunteer Info -->
+    <div id="volunteer" class="col-xs-6 tab-pane fade in">
+        <table class="table borderless">
+            <tr>
+                <td>
+                    <Strong>Restreamer</Strong>
+                </td>
+                <td>
+                    {{ "Yes" if user.is_restreamer() else "No"}}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <Strong>Commentary</Strong>
+                </td>
+                <td>
+                    {{ "Yes" if user.is_commentary() else "No"}}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <Strong>Tracker</Strong>
+                </td>
+                <td>
+                    {{ "Yes" if user.is_tracking() else "No"}}
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
 {% endblock %}

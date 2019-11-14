@@ -3,7 +3,7 @@
 {% block app_content %}
     {% if tournaments %}
         {% for tournament in tournaments %}
-            <h1>{{tournament.name}} - {{ tournament.id }}</h1>
+            <h1>{{tournament.name}}</h1>
             {% if tournament.registration_open() %}
                 <p>
                     Registration for the {{tournament.name}} tournament is now open!
@@ -14,6 +14,9 @@
                     <p>You have signed up for this event.</p>
                     <a class="btn btn-danger" href="{{ url_for('withdraw_registration', tournament_id=tournament.id) }}">Withdraw Registration</a>
                 {% endif %}
+                <p>
+                    Signups will be open until {{ tournament.signups_close }}
+                    </p>
             {% else %}
                 <p>
                     The {{ tournament.name }} tournament is currently active.

@@ -113,7 +113,7 @@ class User(UserMixin, db.Model):
     def is_volunteer(self):
         return self.volunteer_info is not None
 
-    def is_restream(self):
+    def is_restreamer(self):
         return self.is_volunteer() and self.volunteer_info.restream
 
     def is_commentary(self):

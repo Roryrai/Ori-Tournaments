@@ -6,7 +6,7 @@ from app.models import RunnerInfo
 from app.models import VolunteerInfo
 from app.forms import LoginForm
 from app.forms import ExistingRegistrationForm
-from app.forms import NewRegistrationForm
+from app.forms import CombinedRegistrationForm
 from app.forms import CreateAccountForm
 from app.forms import CreateTournamentForm
 
@@ -136,7 +136,7 @@ def register(tournament_id):
             flash("Your registration has been received. We ask that you verify that all information on your profile is correct prior to the start of the event.")
             return redirect(url_for("index"))
     else:
-        form = NewRegistrationForm()
+        form = CombinedRegistrationForm()
         if form.validate_on_submit():
             runner_info = RunnerInfo()
             runner_info.srl_name = form.srl_name.data
@@ -145,6 +145,7 @@ def register(tournament_id):
             runner_info.input_method = form.input_method.data if form.input_method.data is not None else form.other_input_method.data
             runner_info.availability_weekday = "All"
             runner_info.availability_weekend = "All"
+
 
             volunteer_info = VolunteerInfo()
             volunteer_info.restream = form.restream.data

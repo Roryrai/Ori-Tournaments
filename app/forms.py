@@ -34,9 +34,37 @@ class CreateAccountForm(FlaskForm):
         if user is not None:
             raise ValidationError("That username is taken")
 
+class EditProfileForm():
+    # General info
+    username = StringField("Username", validators=[DataRequired()])
+    password = PasswordField("Update Password")
+    password2 = PasswordField("Confirm Password", validators=[EqualTo("password")])
+    discord_name = StringField("Discord Name", validators=[DataRequired()])
+    pronunciation = StringField("How is your username pronounced?", validators=[DataRequired()])
+    pronouns = RadioField("What are your preferred pronouns?", choices=[("he/him", "He/Him"), ("she/her", "She/Her"), ("they/them", "They/Them")], validators=[DataRequired()])
+    interesting_facts = StringField("What are some interesting facts about yourself?")
+
+    # Runner info
+    srl_name = StringField("SpeedRunsLive Name", validators=[DataRequired()])
+    twitch_name = StringField("Twitch Name", validators=[DataRequired()])
+    src_name = StringField("Speedrun.com Name", validators=[DataRequired()])
+    input_method = RadioField("Input Method", choices=[("kbm", "Keyboard & Mouse"), ("controller", "Controller"), ("hybrid", "Hybrid"), ("other", "Other")], validators=[DataRequired()])
+    other_input_method = StringField("Other")
+
+    # Volunteer info
+    restream = BooleanField("Are you able and willing to restream tournament matches?")
+    commentary = BooleanField("Are you interested in providing commentary for tournament matches?")
+    tracking = BooleanField("Are you interested in tracking stats and providing information to commentators during races?")
+    submit = SubmitField("Submit Registration")
+
+    def validate_username(form, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user is not None:
+            raise ValidationError("That username is taken")
+
 
 # Form for users who don't have a profile in the database already
-class NewRegistrationForm(FlaskForm):
+class CombinedRegistrationForm(FlaskForm):
     runner = RadioField(choices=[("yes", "Yes"), ("no", "No")], validators=[DataRequired()])
     runner.label = "Will you be participating as a runner?"
     srl_name = StringField("SpeedRunsLive Name", validators=[DataRequired()])
@@ -55,6 +83,9 @@ class NewRegistrationForm(FlaskForm):
         if form.input_method.data == "Other" and (other_input_method.data is None or other_input_method.data == ""):
             raise ValidationError("Please specify your input method")
 
+
+class RunnerRegistrationForm(FlaskForm):
+    pass
 
 # Form for runners who already have their profiles filled out
 class ExistingRegistrationForm(FlaskForm):
@@ -87,3 +118,13 @@ class CreateTournamentForm(FlaskForm):
     def validate_end_date(form, end_date):
         if end_date.data < form.start_date.data:
             raise ValidationError("End date must be after start date.")
+
+class EditTournamentForm(FlaskForm):
+    pass
+
+class RaceResultForm(FlaskForm):
+    pass
+
+class EditRaceResultForm(FlaskForm):
+    pass
+
