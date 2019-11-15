@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block app_content %}
+<h1>Edit Profile</h1>
+<h3>{{ current_user.username }}</h3>
+{% for error in form.errors %}
+<div style="margin-top:50px; margin-bottom:50px;">
+    <alert class="alert alert-danger">{{ error }}</alert>
+</div>
+{% endfor %}
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a data-toggle="tab" href="#general">General</a>
+        </li>
+        <li>
+            <a data-toggle="tab" href="#runner">Runner Info</a>
+        </li>
+        <li>
+            <a data-toggle="tab" href="#volunteer">Volunteer Info</a>
+        </li>
+        <li>
+            <a data-toggle="tab" href="#account">Account</a>
+        </li>
+        <li style="float:right;">
+            {{ wtf.form_field(form.submit, class="btn btn-primary") }}
+        </li>
+    </ul>
+
+    <div class="tab-content" style="margin-top:15px;">
+        <!-- General profile information -->
+        <div id="general" class="tab-pane fade in active">
+            <div class="form-group col-md-6">
+                {{ wtf.form_field(form.discord_name, class="form-control") }}
+                {{ wtf.form_field(form.pronunciation, class="form-control") }}
+                <label for="pronouns" style="margin-bottom:-10px;">{{form.pronouns.label}}</label>
+                {{ wtf.form_field(form.pronouns, class="form-control") }}
+                {{ wtf.form_field(form.interesting_facts, class="form-control", rows="5", maxlength="500") }}
+            </div>
+        </div>
+        <!-- Runner profile -->
+        <div id="runner" class="tab-pane fade in">
+            <!-- Disable alert if user has participated in tournaments before -->
+            <alert class="col-xs-12 alert alert-info">You can edit your runner profile even if you're not signed up for any tournaments yet.</alert>
+            <div class="form-group col-md-6">
+                {{ wtf.form_field(form.twitch_name, class="form-control") }}
+                {{ wtf.form_field(form.srl_name, class="form-control") }}
+                {{ wtf.form_field(form.src_name, class="form-control") }}
+                <label for="input_method" style="margin-bottom:-10px;">{{form.input_method.label}}</label>
+                {{ wtf.form_field(form.input_method, class="form-control") }}
+                {{ wtf.form_field(form.other_input_method, class="form-control") }}
+            </div>
+        </div>
+        <!-- Volunteer profile -->
+        <div id="volunteer" class="tab-pane fade in">
+            <alert class="col-xs-12 alert alert-info">Your volunteer preferences apply to all tournaments you sign up for.</alert>
+            <div class="form-group col-md-6">
+                <label for="restream" style="margin-bottom:-10px;">{{form.restream.label}}</label>
+                {{ wtf.form_field(form.restream, class="form-control") }}
+                <label for="commentary" style="margin-bottom:-10px;">{{form.commentary.label}}</label>
+                {{ wtf.form_field(form.commentary, class="form-control") }}
+                <label for="tracking" style="margin-bottom:-10px;">{{form.tracking.label}}</label>
+                {{ wtf.form_field(form.tracking, class="form-control") }}
+            </div>
+        </div>
+        <!-- Change password -->
+        <div id="account" class="tab-pane fade in">
+            <div class="form-group col-md-6">
+                {{ wtf.form_field(form.current_password, class="form-control") }}
+                {{ wtf.form_field(form.new_password, class="form-control") }}
+                {{ wtf.form_field(form.new_password2, class="form-control") }}
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

@@ -4,18 +4,22 @@
 <table class="table borderless">
     <tr>
         <td>
+            {% if user == current_user %}
+            <a class="btn btn-default" href="{{ url_for('edit_profile') }}" style="float:right;">Edit Profile</a>
+            {% endif %}
             <h1>{{ user.username }}</h1>
             {% if user.is_organizer() %}
-            <p>Tournament Organizer</p>
+            <span><em>Tournament Organizer</em></span>
             {% endif %}
         </td>
     </tr>
 </table>
 
+
 {% if user.is_runner() or user.is_volunteer() %}
 <ul class="nav nav-tabs">
     <li class="active">
-        <a data-toggle="tab" href="#profile">Profile</a>
+        <a data-toggle="tab" href="#profile">General</a>
     </li>
     {% if user.is_runner() %}
     <li>
@@ -35,114 +39,111 @@
 
 <div class="tab-content">
     <!-- General profile information -->
-    <div id="profile" class="col-xs-6 tab-pane fade in active">
-        <table class="table borderless">
-            <tr>
-                <td><strong>Discord Name</strong></td>
-                <td>{{ user.discord_name }}</a></td>
-            </tr>
-            <tr>
-                <td>
-                    <Strong>Preferred Pronouns</Strong>
-                </td>
-                <td>
-                    {{ user.pronouns }}
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <Strong>About</Strong>
-                </td>
-                <td>
-                    {{ user.interesting_facts }}
-                </td>
-            </tr>
-        </table>
+    <div id="profile" class="col-sm-6 tab-pane fade in active">
+        <div class="row" style="margin-top:10px">
+            <div class="col-xs-6">
+                <strong>Discord Name</strong>
+            </div>
+            <div class="col-xs-6">
+                {{ user.discord_name }}
+            </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+            <div class="col-xs-6">
+                <strong>Preferred Pronouns</strong>
+            </div>
+            <div class="col-xs-6">
+                {{ user.pronouns }}
+            </div>
+        </div>
+        <hr />
+        <div class="row" style="margin-top:10px">
+            <div class="col-xs-6">
+                <strong>About</strong>
+            </div>
+            <div class="col-xs-6">
+                {{ user.interesting_facts }}
+            </div>
+        </div>
     </div>
 
     <!-- Runner profile information -->
-    <div id="runner" class="col-xs-6 tab-pane fade in">
-        <table class="table borderless">
-            <tr>
-                <td><strong>Twitch Name</strong></td>
-                <td><a href="{{ 'https://twitch.tv/%s' % user.runner_info.twitch_name }}">{{ user.runner_info.twitch_name }}</a></td>
-            </tr>
-            <tr>
-                <td>
-                    <Strong>Speedrun.com username</Strong>
-                </td>
-                <td>
-                    {{ user.runner_info.src_name }}
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <Strong>SpeedRunsLive username</Strong>
-                </td>
-                <td>
-                    {{ user.runner_info.srl_name }}
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <Strong>Input Method</Strong>
-                </td>
-                <td>
-                    {{ user.runner_info.input_method }}
-                </td>
-            </tr>
-        </table>
+    <div id="runner" class="col-sm-6 tab-pane fade in">
+        <div class="row" style="margin-top:10px">
+            <div class="col-xs-6">
+                <strong>Twitch Name</strong>
+            </div>
+            <div class="col-xs-6">
+                <a href="{{ 'https://twitch.tv/%s' % user.runner_info.twitch_name }}">{{ user.runner_info.twitch_name }}</a>
+            </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+            <div class="col-xs-6">
+                <strong>Speedrun.com username</strong>
+            </div>
+            <div class="col-xs-6">
+                {{ user.runner_info.src_name }}
+            </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+            <div class="col-xs-6">
+                <strong>SpeedRunsLive username</strong>
+            </div>
+            <div class="col-xs-6">
+                {{ user.runner_info.srl_name }}
+            </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+            <div class="col-xs-6">
+                <strong>Input Method</strong>
+            </div>
+            <div class="col-xs-6">
+                {{ user.runner_info.input_method }}
+            </div>
+        </div>
     </div>
 
     <!-- Race Information -->
-    <div id="race_history" class="col-xs-6 tab-pane fade in">
-        <table class="table borderless">
-            {% if user.race_results %}
-            {% for result in user.race_results %}
-            <tr>
-                <td>
-                    {{result.race.date}}, {{result.time}}
-                </td>
-            </tr>
-            {% else %}
-            <tr>
-                <td>
-                    <p>This user has no race history recorded.</p>
-                </td>
-            </tr>
-            {% endfor %}
-            {% endif %}
-        </table>
+    <div id="race_history" class="col-sm-6 tab-pane fade in">
+        {% for result in user.race_results %}
+        <div class="row" style="margin-top:10px">
+            <div class="col-xs-12">
+                {{ result.race.date }}, {{result.time}}
+            </div>
+        </div>
+        {% else %}
+        <div class="row" style="margin-top:10px">
+            <span>This user has no recorded race results.</span>
+        </div>
+        {% endfor %}
     </div>
 
     <!-- Volunteer Info -->
-    <div id="volunteer" class="col-xs-6 tab-pane fade in">
-        <table class="table borderless">
-            <tr>
-                <td>
-                    <Strong>Restreamer</Strong>
-                </td>
-                <td>
-                    {{ "Yes" if user.is_restreamer() else "No"}}
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <Strong>Commentary</Strong>
-                </td>
-                <td>
-                    {{ "Yes" if user.is_commentary() else "No"}}
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <Strong>Tracker</Strong>
-                </td>
-                <td>
-                    {{ "Yes" if user.is_tracking() else "No"}}
-                </td>
-            </tr>
-        </table>
+    <div id="volunteer" class="col-sm-6 tab-pane fade in">
+        <div class="row" style="margin-top:10px">
+            <div class="col-xs-6">
+                <strong>Restreamer</strong>
+            </div>
+            <div class="col-xs-6">
+                {{ "Yes" if user.is_restreamer() else "No"}}
+            </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+            <div class="col-xs-6">
+                <strong>Commentator</strong>
+            </div>
+            <div class="col-xs-6">
+                {{ "Yes" if user.is_commentary() else "No"}}
+            </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+            <div class="col-xs-6">
+                <strong>Tracker</strong>
+            </div>
+            <div class="col-xs-6">
+                {{ "Yes" if user.is_tracking() else "No"}}
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

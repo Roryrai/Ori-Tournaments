@@ -25,6 +25,7 @@ class Tournament(db.Model):
     signups_close = db.Column(db.DateTime())
     visible = db.Column(db.Boolean, nullable=False)
     name = db.Column(db.String(60))
+    active = db.Column(db.Boolean, default=False)
 
     questions = db.relationship("Question", back_populates="tournament", lazy="dynamic")
     bracket_nodes = db.relationship("BracketNode", back_populates="tournament", lazy="dynamic")
@@ -33,11 +34,11 @@ class Tournament(db.Model):
     seeds = db.relationship("RunnerSeed", back_populates="tournament", lazy="dynamic")
     entrants = db.relationship("Entrant", back_populates="tournament", lazy="dynamic")
 
-    def is_active(self):
-        if self.signups_open is not None and self.end_date is not None:
-            return self.signups_open <= datetime.utcnow() <= self.end_date
-        else:
-            return False
+    # def is_active(self):
+    #     if self.signups_open is not None and self.end_date is not None:
+    #         return self.signups_open <= datetime.utcnow() <= self.end_date
+    #     else:
+    #         return False
 
     def registration_open(self):
         if self.signups_open is not None and self.signups_close is not None:
@@ -63,6 +64,7 @@ class User(UserMixin, db.Model):
     timestamp = db.Column(db.DateTime(), default=datetime.utcnow, nullable=False)
     password_hash = db.Column(db.String(128))
     salt = db.Column(db.String(32))
+    organizer = db.Column(db.Boolean, default=False)
 
 
     runner_info = db.relationship("RunnerInfo", back_populates="user", uselist=False, lazy="joined")
@@ -123,7 +125,7 @@ class User(UserMixin, db.Model):
         return self.is_volunteer() and self.volunteer_info.tracking
 
     def is_organizer(self):
-        return self.is_volunteer() and self.volunteer_info.organizer
+        return self.organizer
 
     def __repr__(self):
         return "<User %s>" % self.username

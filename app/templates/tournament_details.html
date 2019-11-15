@@ -4,6 +4,6 @@
 <h1>{{ tournament.name }}</h1>
 <h3>Entrants</h3>
 {% for entrant in tournament.entrants %}
-    {{ entrant.user.username }}<br />
+    <a href="{{ url_for('user', username=entrant.user.username) }}">{{ entrant.user.username }}</a><br />
 {% endfor %}
 {% endblock %}
