@@ -28,19 +28,19 @@ from flask_login import logout_user
 from flask_login import login_required
 
 
-
 @app.route("/")
 @app.route("/index")
 def index():
     now = datetime.utcnow()
-    tournaments = Tournament.query.filter(Tournament.signups_open <= now, now <= Tournament.end_date, Tournament.visible != False).all()
-    return render_template("index.html", user=current_user, tournaments=tournaments)
+    tournament_list = Tournament.query.filter(Tournament.signups_open <= now, now <= Tournament.end_date,
+                                              Tournament.visible).all()
+    return render_template("index.html", user=current_user, tournaments=tournament_list)
 
 
 @app.route("/newuser", methods=["GET", "POST"])
 def newuser():
     if current_user.is_authenticated:
-        return redirec(url_for("index"))
+        return redirect(url_for("index"))
     form = CreateAccountForm()
     if form.validate_on_submit():
         user = User()
@@ -86,12 +86,34 @@ def user(username):
     user=User.query.filter_by(username=username).first_or_404()
     return render_template("user.html", user=user)
 
+
 @app.route("/edit_profile", methods=["GET", "POST"])
 def edit_profile():
     form = EditProfileForm()
     if form.validate_on_submit():
-        # Update user
+        # Update all basic information
+        user.discord_name = form.discord_name.data
+        user.pronunciation = form.pronunciation.data
+        user.pronouns = form.pronouns.data
+        user.about = form.about.data
+
+        if form.has_runner_info():
+            if user.runner_info is None:
+                user.runner_info = RunnerInfo()
+            user.runner_info.twitch_name = form.twitch_name.data
+            user.runner_info.srl_name = form.srl_name.data
+            user.runner_info.src_name = form.src_name.data
+            user.runner_info.input_method = form.input_method.data
+
+        if form.has_volunteer_info():
+            if user.volunteer_info is None:
+                user.volunteer_info = VolunteerInfo()
+            user.volunteer_info.restream = form.restream.data
+            user.volunteer_info.commentary = form.commentary.data
+            user.volunteer_info.tracking = form.tracking.data
+        db.session.commit()
         flash("Profile updated (except not really)")
+
         return redirect(url_for("user", username=current_user.username))
     elif request.method == "GET":
         # Populate form
@@ -113,16 +135,21 @@ def edit_profile():
             form.tracking.data = "yes" if current_user.volunteer_info.tracking else "no"
     return render_template("edit_profile.html", title="Edit Profile", form=form)
 
+
 @app.route("/tournaments")
 def tournaments():
-    now = datetime.utcnow()
     # Active tournaments - signups have opened and the tournament has not concluded
     active = Tournament.query.filter_by(active=True, visible=True)
+
     # Inactive tournaments - signups are not yet open or the tournament has concluded
     inactive = Tournament.query.filter_by(active=False, visible=True)
+
     # Planned tournaments - flagged as visible=false by organizers - active status doesn't matter
     planned = Tournament.query.filter_by(visible=False)
-    return render_template("tournaments.html", title="Tournament List", tournaments=active, history=inactive, planned = planned)
+
+    return render_template("tournaments.html", title="Tournament List", tournaments=active,
+                           history=inactive, planned=planned)
+
 
 @app.route("/tournaments/new", methods=["GET", "POST"])
 @login_required
@@ -153,6 +180,7 @@ def tournament_details(tournament_id):
         return redirect(url_for("tournaments"))
     return render_template("tournament_details.html", title="%s" % tournament.name, tournament=tournament)
 
+
 @app.route("/tournaments/<tournament_id>/register", methods=["GET", "POST"])
 @login_required
 def register(tournament_id):
@@ -161,7 +189,8 @@ def register(tournament_id):
         form = ExistingRegistrationForm()
         if form.validate_on_submit():
             current_user.register(tournament_id)
-            flash("Your registration has been received. We ask that you verify that all information on your profile is correct prior to the start of the event.")
+            flash("Your registration has been received. \
+            We ask that you verify that all information on your profile is correct prior to the start of the event.")
             return redirect(url_for("index"))
     else:
         form = CombinedRegistrationForm()
@@ -170,16 +199,16 @@ def register(tournament_id):
             runner_info.srl_name = form.srl_name.data
             runner_info.twitch_name = form.twitch_name.data
             runner_info.src_name = form.src_name.data
-            runner_info.input_method = form.input_method.data if form.input_method.data is not None else form.other_input_method.data
+            runner_info.input_method = form.input_method.data \
+                if form.input_method.data is not None \
+                else form.other_input_method.data
             runner_info.availability_weekday = "All"
             runner_info.availability_weekend = "All"
-
 
             volunteer_info = VolunteerInfo()
             volunteer_info.restream = form.restream.data
             volunteer_info.commentary = form.commentary.data
             volunteer_info.tracking = form.tracking.data
-            volunteer_info.organizer = False
 
             current_user.runner_info = runner_info
             current_user.volunteer_info = volunteer_info
@@ -191,12 +220,14 @@ def register(tournament_id):
             return redirect(url_for("index"))
     return render_template("register.html", title="Register - %s" % tournament.name, form=form, tournament=tournament)
 
+
 @app.route("/tournaments/<tournament_id>withdraw")
 @login_required
 def withdraw_registration(tournament_id):
     current_user.withdraw(tournament_id)
     flash("Your registration has been withdrawn.")
     return redirect(url_for("index"))
+
 
 @app.errorhandler(404)
 def not_found_error(error):

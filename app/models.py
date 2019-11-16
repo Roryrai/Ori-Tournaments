@@ -1,7 +1,7 @@
 from app import db
 from app import login
 from datetime import datetime
-from sqlalchemy_utils import LtreeType, Ltree
+from sqlalchemy_utils import LtreeType
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from flask_login import UserMixin
@@ -9,9 +9,11 @@ from flask_login import UserMixin
 import random
 import string
 
+
 @login.user_loader
-def load_user(id):
-    return User.query.get(int(id))
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
 
 # Top-level tournament object. Most things are accessible from somewhere in here
 class Tournament(db.Model):
@@ -34,18 +36,11 @@ class Tournament(db.Model):
     seeds = db.relationship("RunnerSeed", back_populates="tournament", lazy="dynamic")
     entrants = db.relationship("Entrant", back_populates="tournament", lazy="dynamic")
 
-    # def is_active(self):
-    #     if self.signups_open is not None and self.end_date is not None:
-    #         return self.signups_open <= datetime.utcnow() <= self.end_date
-    #     else:
-    #         return False
-
     def registration_open(self):
         if self.signups_open is not None and self.signups_close is not None:
             return self.signups_open <= datetime.utcnow() <= self.signups_close
         else:
             return False
-
 
     def __repr__(self):
         return "<Tournament %s>" % self.name
@@ -60,12 +55,11 @@ class User(UserMixin, db.Model):
     discord_name = db.Column(db.String(60), nullable=False)
     pronunciation = db.Column(db.String(60))
     pronouns = db.Column(db.String(10), nullable=False)
-    interesting_facts = db.Column(db.String(500))
+    about = db.Column(db.String(500))
     timestamp = db.Column(db.DateTime(), default=datetime.utcnow, nullable=False)
     password_hash = db.Column(db.String(128))
     salt = db.Column(db.String(32))
     organizer = db.Column(db.Boolean, default=False)
-
 
     runner_info = db.relationship("RunnerInfo", back_populates="user", uselist=False, lazy="joined")
     volunteer_info = db.relationship("VolunteerInfo", back_populates="user", uselist=False, lazy="joined")
@@ -75,7 +69,6 @@ class User(UserMixin, db.Model):
     groups = db.relationship("RunnerGroup", back_populates="user", lazy="dynamic")
     seeds = db.relationship("RunnerSeed", back_populates="user", lazy="dynamic")
     tournaments = db.relationship("Entrant", back_populates="user", lazy="dynamic")
-
 
     # Password stuff
     def generate_salt(self):
@@ -104,7 +97,6 @@ class User(UserMixin, db.Model):
             db.session.delete(registration)
             db.session.commit()
 
-
     def is_registered(self, tournament_id):
         return Entrant.query.filter_by(user_id=self.id, tournament_id=tournament_id).first() is not None
 
@@ -115,7 +107,7 @@ class User(UserMixin, db.Model):
     def is_volunteer(self):
         return self.volunteer_info is not None
 
-    def is_restreamer(self):
+    def is_restream(self):
         return self.is_volunteer() and self.volunteer_info.restream
 
     def is_commentary(self):
