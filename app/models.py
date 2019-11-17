@@ -35,6 +35,7 @@ class Tournament(db.Model):
     groups = db.relationship("RunnerGroup", back_populates="tournament", lazy="dynamic")
     seeds = db.relationship("RunnerSeed", back_populates="tournament", lazy="dynamic")
     entrants = db.relationship("Entrant", back_populates="tournament", lazy="dynamic")
+    volunteers = db.relationship("Volunteer", back_populates="tournament", lazy="dynamic")
 
     def registration_open(self):
         if self.signups_open is not None and self.signups_close is not None:
@@ -68,12 +69,14 @@ class User(UserMixin, db.Model):
     race_results = db.relationship("RaceResult", back_populates="user", lazy="dynamic")
     groups = db.relationship("RunnerGroup", back_populates="user", lazy="dynamic")
     seeds = db.relationship("RunnerSeed", back_populates="user", lazy="dynamic")
-    tournaments = db.relationship("Entrant", back_populates="user", lazy="dynamic")
+    tournaments_entered = db.relationship("Entrant", back_populates="user", lazy="dynamic")
+    tournaments_volunteered = db.relationship("Volunteer", back_populates="user", lazy="dynamic")
 
     # Password stuff
     def generate_salt(self):
         if self.salt is None:
-            salt = ''.join([random.choice(string.ascii_letters + string.digits + string.punctuation) for n in range(32)])
+            salt = ''.join([random.choice(string.ascii_letters + string.digits + string.punctuation)
+                            for n in range(32)])
             self.salt = salt
 
     def set_password(self, password):
@@ -170,8 +173,10 @@ class Question(db.Model):
 
     responses = db.relationship("Response", back_populates="question", lazy="dynamic")
     tournament = db.relationship("Tournament", back_populates="questions", uselist=False)
+
     def __repr__(self):
         return "<Question %s>" % self.question
+
 
 # Association object for a user's responses to questions
 class Response(db.Model):
@@ -205,7 +210,6 @@ class BracketNode(db.Model):
     races = db.relationship("Race", back_populates="bracket_node")
     tournament = db.relationship("Tournament", back_populates="bracket_nodes", uselist=False)
     user = db.relationship("User", back_populates="bracket_nodes", uselist=False)
-
 
     def __repr__(self):
         return "<BracketNode %s - path: %s, runner: %s>" % (self.node, self.path, self.user)
@@ -300,3 +304,14 @@ class Entrant(db.Model):
 
     user = db.relationship("User", back_populates="tournaments")
     tournament = db.relationship("Tournament", back_populates="entrants")
+
+
+class Volunteer(db.Model):
+    __tablename__ = "tournament_volunteers"
+
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    tournament_id = db.Column(db.Integer, db.ForeignKey("tournaments.id"), nullable=False)
+
+    user = db.relationship("User", back_populates="tournaments")
+    tournament = db.relationship("Tournament", back_populates="volunteers")

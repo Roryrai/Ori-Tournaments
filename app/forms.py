@@ -12,6 +12,7 @@ from wtforms.validators import ValidationError
 from app.models import User
 from datetime import date
 
+
 class LoginForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])
     password = PasswordField("Password", validators=[DataRequired()])
@@ -30,10 +31,11 @@ class CreateAccountForm(FlaskForm):
     interesting_facts = TextAreaField("What are some interesting facts about yourself?")
     submit = SubmitField("Create Account")
 
-    def validate_username(form, username):
+    def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
         if user is not None:
-            raise ValidationError("That username is taken")
+            raise ValidationError("That username is taken.")
+
 
 class EditProfileForm(FlaskForm):
     # General info
@@ -61,24 +63,41 @@ class EditProfileForm(FlaskForm):
     validate_runner_info = False
 
     def runner_info_required(self):
-        self.srl_name.validators=[DataRequired()]
-        self.twitch_name.validators=[DataRequired()]
-        self.src_name.validators=[DataRequired()]
-        self.input_method.validators=[DataRequired()]
+        self.srl_name.validators = [DataRequired()]
+        self.twitch_name.validators = [DataRequired()]
+        self.src_name.validators = [DataRequired()]
+        self.input_method.validators = [DataRequired()]
 
-    def validate_username(form, username):
+    def has_runner_info(self):
+        return (self.twitch_name.data is not None and self.twitch_name.data is not "") and \
+                    (self.srl_name.data is not None and self.srl_name.data is not "") and \
+                    (self.src_name.data is not None and self.src_name.data is not "") and \
+                    (self.input_method.data is not "na")
+
+    def validate_runner_tab(self):
+        if (self.twitch_name.data is not None or self.twitch_name.data is not "") or \
+                (self.srl_name.data is not None or self.srl_name.data is not "") or \
+                (self.src_name.data is not None or self.src_name.data is not "") or \
+                (self.input_method.data is not "na"):
+            if (self.twitch_name.data is None or self.twitch_name.data is "") or \
+                    (self.srl_name.data is None or self.srl_name.data is "") or \
+                    (self.src_name.data is None or self.src_name.data is "") or \
+                    (self.input_method.data is "na"):
+                raise ValidationError("You must fill out all sections of runner info or none of them.")
+
+    def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
         if user is not None:
-            raise ValidationError("That username is taken")
+            raise ValidationError("That username is taken.")
 
-    def validate_other_input_method(form, other_input_method):
-        if form.input_method.data == "Other" and (other_input_method.data is None or other_input_method.data == ""):
-            raise ValidationError("Please specify your input method")
+    def validate_other_input_method(self, other_input_method):
+        if self.input_method.data == "Other" and (other_input_method.data is None or other_input_method.data == ""):
+            raise ValidationError("Please specify your input method.")
 
-    def validate_update_password(form, update_password):
+    def validate_update_password(self, update_password):
         if update_password.data is not None and update_password.data is not "":
-            if not current_user.check_password(form.current_password.data):
-                raise ValidationError("Your current password is incorrect")
+            if not current_user.check_password(self.current_password.data):
+                raise ValidationError("Your current password is incorrect.")
 
 
 # Form for users who don't have a profile in the database already
@@ -87,26 +106,33 @@ class CombinedRegistrationForm(FlaskForm):
     srl_name = StringField("SpeedRunsLive Name", validators=[DataRequired()])
     twitch_name = StringField("Twitch Name", validators=[DataRequired()])
     src_name = StringField("Speedrun.com Name", validators=[DataRequired()])
-    input_method = RadioField("Input Method", choices=[("kbm", "Keyboard & Mouse"), ("controller", "Controller"), ("hybrid", "Hybrid"), ("other", "Other")], validators=[DataRequired()])
+    input_method = RadioField("Input Method", choices=[("kbm", "Keyboard & Mouse"),
+                                                       ("controller", "Controller"),
+                                                       ("hybrid", "Hybrid"),
+                                                       ("other", "Other")], validators=[DataRequired()])
     other_input_method = StringField("Other Input Method (Please specify)")
 
-    volunteer = RadioField("Will you be participating as a volunteer?", choices=[("yes", "Yes"), ("no", "No")], validators=[DataRequired()])
+    volunteer = RadioField("Will you be participating as a volunteer?", choices=[("yes", "Yes"), ("no", "No")],
+                           validators=[DataRequired()])
     restream = BooleanField("Are you able and willing to restream tournament matches?")
     commentary = BooleanField("Are you interested in providing commentary for tournament matches?")
-    tracking = BooleanField("Are you interested in tracking stats and providing information to commentators during races?")
+    tracking = BooleanField("Are you interested in tracking stats and providing information to \
+                            commentators during races?")
     submit = SubmitField("Submit Registration")
 
-    def validate_other_input_method(form, other_input_method):
-        if form.input_method.data == "Other" and (other_input_method.data is None or other_input_method.data == ""):
-            raise ValidationError("Please specify your input method")
+    def validate_other_input_method(self, other_input_method):
+        if self.input_method.data == "Other" and (other_input_method.data is None or other_input_method.data == ""):
+            raise ValidationError("Please specify your input method.")
 
 
 class RunnerRegistrationForm(FlaskForm):
     pass
 
+
 # Form for runners who already have their profiles filled out
 class ExistingRegistrationForm(FlaskForm):
     submit = SubmitField("Register")
+
 
 class CreateTournamentForm(FlaskForm):
     name = StringField("Tournament Name", validators=[DataRequired()])
@@ -118,29 +144,32 @@ class CreateTournamentForm(FlaskForm):
     visible = BooleanField("Visible")
     submit = SubmitField("Create Tournament", validators=[DataRequired()])
 
-    def validate_signups_open(form, signups_open):
+    def validate_signups_open(self, signups_open):
         if signups_open.data < date.today():
             raise ValidationError("Signups should open in the future.")
 
-    def validate_signups_close(form, signups_close):
-        if signups_close.data < form.signups_open.data:
+    def validate_signups_close(self, signups_close):
+        if signups_close.data < self.signups_open.data:
             raise ValidationError("Signups must be open before they close.")
 
-    def validate_start_date(form, start_date):
+    def validate_start_date(self, start_date):
         if start_date.data < date.today():
             raise ValidationError("Start date must be in the future.")
-        if start_date.data < form.signups_open.data:
+        if start_date.data < self.signups_open.data:
             raise ValidationError("Start date must be after signups open.")
 
-    def validate_end_date(form, end_date):
-        if end_date.data < form.start_date.data:
+    def validate_end_date(self, end_date):
+        if end_date.data < self.start_date.data:
             raise ValidationError("End date must be after start date.")
+
 
 class EditTournamentForm(FlaskForm):
     pass
 
+
 class RaceResultForm(FlaskForm):
     pass
+
 
 class EditRaceResultForm(FlaskForm):
     pass
