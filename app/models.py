@@ -302,7 +302,7 @@ class Entrant(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     tournament_id = db.Column(db.Integer, db.ForeignKey("tournaments.id"), nullable=False)
 
-    user = db.relationship("User", back_populates="tournaments")
+    user = db.relationship("User", back_populates="tournaments_entered")
     tournament = db.relationship("Tournament", back_populates="entrants")
 
 
@@ -313,5 +313,5 @@ class Volunteer(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     tournament_id = db.Column(db.Integer, db.ForeignKey("tournaments.id"), nullable=False)
 
-    user = db.relationship("User", back_populates="tournaments")
+    user = db.relationship("User", back_populates="tournaments_volunteered")
     tournament = db.relationship("Tournament", back_populates="volunteers")

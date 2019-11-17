@@ -27,7 +27,6 @@ from flask_login import login_user
 from flask_login import logout_user
 from flask_login import login_required
 
-
 @app.route("/")
 @app.route("/index")
 def index():
@@ -49,7 +48,7 @@ def newuser():
         user.discord_name = form.discord_name.data
         user.pronunciation = form.pronunciation.data
         user.pronouns = form.pronouns.data
-        user.interesting_facts = form.interesting_facts.data
+        user.interesting_facts = form.about.data
         db.session.add(user)
         db.session.commit()
         login_user(user, remember=False)
@@ -83,7 +82,7 @@ def logout():
 
 @app.route("/user/<username>")
 def user(username):
-    user=User.query.filter_by(username=username).first_or_404()
+    user = User.query.filter_by(username=username).first_or_404()
     return render_template("user.html", user=user)
 
 
@@ -92,35 +91,39 @@ def edit_profile():
     form = EditProfileForm()
     if form.validate_on_submit():
         # Update all basic information
-        user.discord_name = form.discord_name.data
-        user.pronunciation = form.pronunciation.data
-        user.pronouns = form.pronouns.data
-        user.about = form.about.data
+        current_user.discord_name = form.discord_name.data
+        current_user.pronunciation = form.pronunciation.data
+        current_user.pronouns = form.pronouns.data
+        current_user.about = form.about.data
 
-        if form.has_runner_info():
-            if user.runner_info is None:
-                user.runner_info = RunnerInfo()
-            user.runner_info.twitch_name = form.twitch_name.data
-            user.runner_info.srl_name = form.srl_name.data
-            user.runner_info.src_name = form.src_name.data
-            user.runner_info.input_method = form.input_method.data
+        if form.has_runner_info() or current_user.runner_info is not None:
+            form.runner_info_required = True
+            if current_user.runner_info is None:
+                current_user.runner_info = RunnerInfo()
+            current_user.runner_info.twitch_name = form.twitch_name.data
+            current_user.runner_info.srl_name = form.srl_name.data
+            current_user.runner_info.src_name = form.src_name.data
+            current_user.runner_info.input_method = form.input_method.data
 
-        if form.has_volunteer_info():
-            if user.volunteer_info is None:
-                user.volunteer_info = VolunteerInfo()
-            user.volunteer_info.restream = form.restream.data
-            user.volunteer_info.commentary = form.commentary.data
-            user.volunteer_info.tracking = form.tracking.data
+        if form.has_volunteer_info() or current_user.volunteer_info is not None:
+            if current_user.volunteer_info is None:
+                current_user.volunteer_info = VolunteerInfo()
+            current_user.volunteer_info.restream = form.restream.data == "yes"
+            current_user.volunteer_info.commentary = form.commentary.data == "yes"
+            current_user.volunteer_info.tracking = form.tracking.data == "yes"
+
+        if form.new_password.data is not None and form.new_password.data is not "":
+            current_user.set_password(form.new_password.data)
+
         db.session.commit()
-        flash("Profile updated (except not really)")
-
+        flash("Your profile has been updated.")
         return redirect(url_for("user", username=current_user.username))
     elif request.method == "GET":
         # Populate form
         form.discord_name.data = current_user.discord_name
         form.pronunciation.data = current_user.pronunciation
         form.pronouns.data = current_user.pronouns
-        form.interesting_facts.data = current_user.interesting_facts
+        form.about.data = current_user.about
 
         if current_user.runner_info is not None:
             form.runner_info_required()

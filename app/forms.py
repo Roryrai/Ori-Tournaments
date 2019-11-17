@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_login import current_user
 from wtforms import StringField
 from wtforms import PasswordField
 from wtforms import BooleanField
@@ -28,7 +29,7 @@ class CreateAccountForm(FlaskForm):
     discord_name = StringField("Discord Name", validators=[DataRequired()])
     pronunciation = StringField("How is your username pronounced?", validators=[DataRequired()])
     pronouns = RadioField("What are your preferred pronouns?", choices=[("he/him", "He/Him"), ("she/her", "She/Her"), ("they/them", "They/Them")], validators=[DataRequired()])
-    interesting_facts = TextAreaField("What are some interesting facts about yourself?")
+    about = TextAreaField("What are some interesting facts about yourself?")
     submit = SubmitField("Create Account")
 
     def validate_username(self, username):
@@ -44,20 +45,30 @@ class EditProfileForm(FlaskForm):
     new_password2 = PasswordField("Confirm Password", validators=[EqualTo("new_password")])
     discord_name = StringField("Discord Name", validators=[DataRequired()])
     pronunciation = StringField("How is your username pronounced?", validators=[DataRequired()])
-    pronouns = RadioField("What are your preferred pronouns?", choices=[("he/him", "He/Him"), ("she/her", "She/Her"), ("they/them", "They/Them")], validators=[DataRequired()])
-    interesting_facts = TextAreaField("What are some interesting facts about yourself?")
+    pronouns = RadioField("What are your preferred pronouns?", choices=[("he/him", "He/Him"),
+                                                                        ("she/her", "She/Her"),
+                                                                        ("they/them", "They/Them")],
+                          validators=[DataRequired()])
+    about = TextAreaField("What are some interesting facts about yourself?")
 
     # Runner info
     srl_name = StringField("SpeedRunsLive Name")
     twitch_name = StringField("Twitch Name")
     src_name = StringField("Speedrun.com Name")
-    input_method = RadioField("Input Method", choices=[("na", "N/A - Not a runner"), ("kbm", "Keyboard & Mouse"), ("controller", "Controller"), ("hybrid", "Hybrid"), ("other", "Other")], default="na")
+    input_method = RadioField("Input Method", choices=[("na", "N/A - Not a runner"),
+                                                       ("kbm", "Keyboard & Mouse"),
+                                                       ("controller", "Controller"),
+                                                       ("hybrid", "Hybrid"),
+                                                       ("other", "Other")], default="na")
     other_input_method = StringField("Other input method (Please specify)")
 
     # Volunteer info
-    restream = RadioField("Are you able and willing to restream tournament matches?", choices=[("yes", "Yes"), ("no", "No")], default="no")
-    commentary = RadioField("Are you interested in providing commentary for tournament matches?", choices=[("yes", "Yes"), ("no", "No")], default="no")
-    tracking = RadioField("Are you interested in tracking stats and providing information to commentators during races?", choices=[("yes", "Yes"), ("no", "No")], default="no")
+    restream = RadioField("Are you able and willing to restream tournament matches?",
+                          choices=[("yes", "Yes"), ("no", "No")], default="no")
+    commentary = RadioField("Are you interested in providing commentary for tournament matches?",
+                            choices=[("yes", "Yes"), ("no", "No")], default="no")
+    tracking = RadioField("Are you interested in tracking stats and providing information to commentators during \
+                            races?", choices=[("yes", "Yes"), ("no", "No")], default="no")
     submit = SubmitField("Save")
 
     validate_runner_info = False
@@ -73,6 +84,9 @@ class EditProfileForm(FlaskForm):
                     (self.srl_name.data is not None and self.srl_name.data is not "") and \
                     (self.src_name.data is not None and self.src_name.data is not "") and \
                     (self.input_method.data is not "na")
+
+    def has_volunteer_info(self):
+        return self.restream.data is not "no" or self.commentary.data is not "no" or self.tracking.data is not "no"
 
     def validate_runner_tab(self):
         if (self.twitch_name.data is not None or self.twitch_name.data is not "") or \
@@ -90,19 +104,25 @@ class EditProfileForm(FlaskForm):
         if user is not None:
             raise ValidationError("That username is taken.")
 
+    def validate_input_method(self, input_method):
+        if self.runner_info_required:
+            if input_method.data == "na":
+                raise ValidationError("You have to have an input method to be a runner.")
+
     def validate_other_input_method(self, other_input_method):
         if self.input_method.data == "Other" and (other_input_method.data is None or other_input_method.data == ""):
             raise ValidationError("Please specify your input method.")
 
-    def validate_update_password(self, update_password):
-        if update_password.data is not None and update_password.data is not "":
+    def validate_new_password(self, new_password):
+        if new_password.data is not None and new_password.data is not "":
             if not current_user.check_password(self.current_password.data):
                 raise ValidationError("Your current password is incorrect.")
 
 
 # Form for users who don't have a profile in the database already
 class CombinedRegistrationForm(FlaskForm):
-    runner = RadioField("Will you be participating as a runner?", choices=[("yes", "Yes"), ("no", "No")], validators=[DataRequired()])
+    runner = RadioField("Will you be participating as a runner?", choices=[("yes", "Yes"), ("no", "No")],
+                        validators=[DataRequired()])
     srl_name = StringField("SpeedRunsLive Name", validators=[DataRequired()])
     twitch_name = StringField("Twitch Name", validators=[DataRequired()])
     src_name = StringField("Speedrun.com Name", validators=[DataRequired()])
