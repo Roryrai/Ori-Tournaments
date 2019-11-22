@@ -6,7 +6,6 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_bootstrap import Bootstrap
 from flask_restful import Api
-from app.api.user_resource import UserResource
 
 app = Flask(__name__)
 
@@ -19,6 +18,8 @@ login.login_view = "login"
 bootstrap = Bootstrap(app)
 
 from app.api import bp as api_bp
+from app.api.user_resource import UserResource
+
 api = Api(app)
 api.add_resource(UserResource, "/api/user/<string:user_id>")
 app.register_blueprint(api_bp)
