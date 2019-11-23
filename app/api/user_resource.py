@@ -1,5 +1,7 @@
 from flask_restful import Resource
-from app.models import User, UserSchema
+from app.models import User
+# from app.schemas.user import UserSchema
+from app.schemas import UserSchema
 
 
 class UserResource(Resource):

@@ -17,11 +17,14 @@ login = LoginManager(app)
 login.login_view = "login"
 bootstrap = Bootstrap(app)
 
+from app.models import bp as models_bp
+from app.schemas import bp as schemas_bp
+app.register_blueprint(models_bp)
+app.register_blueprint(schemas_bp)
+
 from app.api import bp as api_bp
 from app.api.user_resource import UserResource
 
 api = Api(app)
 api.add_resource(UserResource, "/api/user/<string:user_id>")
 app.register_blueprint(api_bp)
-
-from app import models
