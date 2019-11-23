@@ -5,6 +5,8 @@ from sqlalchemy_utils import LtreeType
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from flask_login import UserMixin
+from marshmallow import Schema
+from marshmallow import fields
 
 import random
 import string
@@ -124,6 +126,36 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return "<User %s>" % self.username
+
+
+class RunnerInfoSchema(Schema):
+    id = fields.Int()
+    user_id = fields.Int()
+    srl_name = fields.Str()
+    twitch_name = fields.Str()
+    src_name = fields.Str()
+    input_method = fields.Str()
+
+
+class VolunteerInfoSchema(Schema):
+    id = fields.Int()
+    user_id = fields.Int()
+    restream = fields.Bool()
+    commentary = fields.Bool()
+    tracking = fields.Bool()
+
+
+class UserSchema(Schema):
+    id = fields.Int()
+    username = fields.Str()
+    discord_name = fields.Str()
+    pronunciation = fields.Str()
+    pronouns = fields.Str()
+    about = fields.Str()
+    timestamp = fields.DateTime()
+    is_organizer = fields.Bool()
+    runner_info = fields.Nested(RunnerInfoSchema)
+    volunteer_info = fields.Nested(VolunteerInfoSchema)
 
 
 # Information about a user who is a runner. All of this info is not tournament-specific.
