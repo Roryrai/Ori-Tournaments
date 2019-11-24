@@ -1,5 +1,6 @@
 from flask import Blueprint
-from app.api import user_resource
+from .user_resource import UserResource
+from .group_name_resource import GroupNameResource
 
 bp = Blueprint("api", __name__)
 

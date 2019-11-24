@@ -1,8 +1,10 @@
 from marshmallow import Schema
 from marshmallow import fields
+from marshmallow import post_load
 
-from app.schemas.runner_info import RunnerInfoSchema
-from app.schemas.volunteer_info import VolunteerInfoSchema
+from app.models import User, RunnerInfo, VolunteerInfo
+from app.schemas import RunnerInfoSchema
+from app.schemas import VolunteerInfoSchema
 
 
 class UserSchema(Schema):
@@ -16,3 +18,7 @@ class UserSchema(Schema):
     is_organizer = fields.Bool()
     runner_info = fields.Nested(RunnerInfoSchema)
     volunteer_info = fields.Nested(VolunteerInfoSchema)
+
+    @post_load
+    def make_user(self, data, **kwargs):
+        return User(**data)
