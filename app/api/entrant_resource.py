@@ -25,8 +25,10 @@ class EntrantResource(Resource):
         return schema.dump(entrant), 201
 
     def delete(self):
-        group_id = request.args["id"]
-        entrant = Entrant.query.get(group_id)
+        tournament_id = request.args["tournament_id"]
+        user_id = request.args["user_id"]
+        print(tournament_id, user_id)
+        entrant = Entrant.query.filter_by(tournament_id=tournament_id, user_id=user_id).first()
         if entrant is not None:
             db.session.delete(entrant)
             db.session.commit()
