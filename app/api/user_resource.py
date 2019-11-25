@@ -9,7 +9,7 @@ from app.schemas import UserSchema
 class UserResource(Resource):
     def get(self):
         args = request.args
-        user_id = args["user_id"]
+        user_id = args["id"]
         user = User.query.get(user_id)
         schema = UserSchema()
         json = schema.dump(user)

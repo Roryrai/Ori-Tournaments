@@ -12,7 +12,7 @@ schema = GroupNameSchema()
 class GroupNameResource(Resource):
     def get(self):
         args = request.args
-        group_id = args["group_id"]
+        group_id = args["id"]
         group_name = GroupName.query.get(group_id)
         json = schema.dump(group_name)
         return json
@@ -31,17 +31,13 @@ class GroupNameResource(Resource):
 
     def put(self):
         data = request.get_json()
-        print(data)
         group_name = schema.load(data)
-        print(group_name)
-        print(group_name.id)
-        print(group_name.group_name)
         db.session.add(group_name)
         db.session.commit()
         return schema.dump(group_name), 201
 
     def delete(self):
-        group_id = request.args["group_id"]
+        group_id = request.args["id"]
         group_name = GroupName.query.get(group_id)
         if group_name is not None:
             db.session.delete(group_name)
