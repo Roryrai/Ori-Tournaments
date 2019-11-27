@@ -2,9 +2,7 @@ from marshmallow import Schema
 from marshmallow import fields
 from marshmallow import post_load
 
-from app.models import User, RunnerInfo, VolunteerInfo
-from app.schemas import RunnerInfoSchema
-from app.schemas import VolunteerInfoSchema
+from app.models import User
 
 
 class UserSchema(Schema):
@@ -16,8 +14,13 @@ class UserSchema(Schema):
     about = fields.Str()
     timestamp = fields.DateTime()
     is_organizer = fields.Bool()
-    runner_info = fields.Nested(RunnerInfoSchema)
-    volunteer_info = fields.Nested(VolunteerInfoSchema)
+    srl_name = fields.Str()
+    twitch_name = fields.Str()
+    src_name = fields.Str()
+    input_method = fields.Str()
+    restream = fields.Bool()
+    commentary = fields.Bool()
+    tracking = fields.Bool()
 
     @post_load
     def make_user(self, data, **kwargs):

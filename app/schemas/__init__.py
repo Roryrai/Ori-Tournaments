@@ -1,6 +1,4 @@
 from flask import Blueprint
-from .runner_info_schema import RunnerInfoSchema
-from .volunteer_info_schema import VolunteerInfoSchema
 from .user_schema import UserSchema
 from .entrant_schema import EntrantSchema
 from .race_schema import RaceSchema
