@@ -4,6 +4,7 @@ from flask_restful import Resource
 
 from app import db
 from app.models import Entrant
+from app.models import User
 from app.schemas import EntrantSchema
 from app.schemas import UserSchema
 
@@ -14,12 +15,11 @@ class EntrantsResource(Resource):
     def get(self):
         args = request.args
         tournament_id = args["tournament_id"]
-        entrants = Entrant.query.filter_by(tournament_id=tournament_id).all()
-        res = list()
-        user_schema = UserSchema()
-        for entrant in entrants:
-            json = user_schema.dump(entrant.user)
-            res.append(json)
+        entrants = db.session.query(User).join(User.tournaments_entered).\
+            filter(Entrant.tournament_id == tournament_id).all()
+        user_schema = UserSchema(many=True)
+
+        res = user_schema.dump(entrants)
         return res
 
     # def put(self):
