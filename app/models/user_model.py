@@ -41,11 +41,10 @@ class User(UserMixin, db.Model):
     commentary = db.Column(db.Boolean, default=False)
     tracking = db.Column(db.Boolean, default=False)
 
-
     question_responses = db.relationship("Response", back_populates="user", lazy="dynamic")
     bracket_nodes = db.relationship("BracketNode", back_populates="user", lazy="dynamic")
     race_results = db.relationship("RaceResult", back_populates="user", lazy="dynamic")
-    groups = db.relationship("RunnerGroup", back_populates="user", lazy="dynamic")
+    groups = db.relationship("Group", back_populates="user", lazy="dynamic")
     seeds = db.relationship("RunnerSeed", back_populates="user", lazy="dynamic")
     tournaments_entered = db.relationship("Entrant", back_populates="user", lazy="dynamic")
     tournaments_volunteered = db.relationship("Volunteer", back_populates="user", lazy="dynamic")

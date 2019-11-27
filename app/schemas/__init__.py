@@ -4,7 +4,7 @@ from .entrant_schema import EntrantSchema
 from .race_schema import RaceSchema
 from .race_result_schema import RaceResultSchema
 from .response_schema import ResponseSchema
-from .runner_group_schema import RunnerGroupSchema
+from .group_schema import GroupSchema
 from .tournament_schema import TournamentSchema
 from .volunteer_schema import VolunteerSchema
 from .group_name_schema import GroupNameSchema

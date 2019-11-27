@@ -8,7 +8,7 @@ class GroupName(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     group_name = db.Column(db.String(60), nullable=False)
 
-    runner_groups = db.relationship("RunnerGroup", back_populates="group", lazy="dynamic")
+    runner_groups = db.relationship("Group", back_populates="group", lazy="dynamic")
 
     def __repr__(self):
         return "<GroupName %s>" % self.group_name

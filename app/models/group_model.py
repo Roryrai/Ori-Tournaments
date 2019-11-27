@@ -2,7 +2,7 @@ from app import db
 
 
 # Association table for putting runners into groups
-class RunnerGroup(db.Model):
+class Group(db.Model):
     __tablename__ = "runner_groups"
 
     id = db.Column(db.Integer, primary_key=True, nullable=False)

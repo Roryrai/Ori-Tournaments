@@ -25,14 +25,4 @@ app.register_blueprint(models_bp)
 app.register_blueprint(schemas_bp)
 
 from app.api import bp as api_bp
-from app.api import UserResource
-from app.api import GroupNameResource
-from app.api import EntrantResource
-from app.api import EntrantsResource
-
-api = Api(app)
-api.add_resource(UserResource, "/api/user")
-api.add_resource(GroupNameResource, "/api/groupname")
-api.add_resource(EntrantResource, "/api/entrant")
-api.add_resource(EntrantsResource, "/api/entrants")
 app.register_blueprint(api_bp, url_prefix="/api")
