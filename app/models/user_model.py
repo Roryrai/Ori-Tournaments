@@ -30,9 +30,18 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     salt = db.Column(db.String(32))
     organizer = db.Column(db.Boolean, default=False)
+    twitch_name = db.Column(db.String(128))
+    srl_name = db.Column(db.String(128))
+    src_name = db.Column(db.String(128))
+    input_method = db.Column(db.String(60))
+    availability_weekday = db.Column(db.String(256))
+    availability_weekend = db.Column(db.String(256))
+    timezone = db.Column(db.String(60))
+    restream = db.Column(db.Boolean, default=False)
+    commentary = db.Column(db.Boolean, default=False)
+    tracking = db.Column(db.Boolean, default=False)
 
-    runner_info = db.relationship("RunnerInfo", back_populates="user", uselist=False, lazy="joined")
-    volunteer_info = db.relationship("VolunteerInfo", back_populates="user", uselist=False, lazy="joined")
+
     question_responses = db.relationship("Response", back_populates="user", lazy="dynamic")
     bracket_nodes = db.relationship("BracketNode", back_populates="user", lazy="dynamic")
     race_results = db.relationship("RaceResult", back_populates="user", lazy="dynamic")
@@ -64,8 +73,8 @@ class User(UserMixin, db.Model):
             db.session.commit()
 
     def withdraw(self, tournament_id):
-        if self.is_registered(tournament_id):
-            registration = Entrant.query.filter_by(user_id=self.id, tournament_id=tournament_id).first()
+        registration = Entrant.query.filter_by(user_id=self.id, tournament_id=tournament_id).first()
+        if registration is not None:
             db.session.delete(registration)
             db.session.commit()
 
@@ -74,19 +83,19 @@ class User(UserMixin, db.Model):
 
     # Functions to extract stuff from other fields
     def is_runner(self):
-        return self.runner_info is not None
+        return self.twitch_name is not None
 
     def is_volunteer(self):
-        return self.volunteer_info is not None
+        return self.commentary and self.restream and self.tracking
 
     def is_restream(self):
-        return self.is_volunteer() and self.volunteer_info.restream
+        return self.restream
 
     def is_commentary(self):
-        return self.is_volunteer() and self.volunteer_info.commentary
+        return self.commentary
 
     def is_tracking(self):
-        return self.is_volunteer() and self.volunteer_info.tracking
+        return self.tracking
 
     def is_organizer(self):
         return self.organizer
