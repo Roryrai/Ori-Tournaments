@@ -1,6 +1,5 @@
 from flask import Blueprint
-from .auth import authenticate
-from .auth import identity
+from .auth import Auth
 
 bp = Blueprint("auth", __name__)
 

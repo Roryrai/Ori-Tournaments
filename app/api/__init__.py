@@ -13,6 +13,8 @@ from .volunteers_resource import VolunteersResource
 from .tournament_resource import TournamentResource
 from .tournaments_resource import TournamentsResource
 
+from .auth_resource import AuthResource
+
 bp = Blueprint("api", __name__)
 
 api = Api(bp)
@@ -29,3 +31,5 @@ api.add_resource(VolunteerResource, "/volunteer")
 api.add_resource(VolunteersResource, "/volunteers")
 api.add_resource(TournamentResource, "/tournament")
 api.add_resource(TournamentsResource, "/tournaments")
+
+api.add_resource(AuthResource, "/auth")

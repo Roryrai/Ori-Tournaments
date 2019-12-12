@@ -7,7 +7,7 @@ from flask_login import LoginManager
 from flask_bootstrap import Bootstrap
 from flask_restful import Api
 from flask_marshmallow import Marshmallow
-from flask_jwt import JWT
+from flask_jwt_extended import JWTManager
 
 
 app = Flask(__name__)
@@ -28,10 +28,11 @@ app.register_blueprint(models_bp)
 app.register_blueprint(schemas_bp)
 
 # Authentication setup
-from app.auth import authenticate
-from app.auth import identity
-jwt = JWT(app, authenticate, identity)
-
+# from app.auth import authenticate
+# from app.auth import identity
+jwt = JWTManager(app)
+from app.auth import bp as auth_bp
+app.register_blueprint(auth_bp)
 # Initialize API
 from app.api import bp as api_bp
 app.register_blueprint(api_bp, url_prefix="/api")

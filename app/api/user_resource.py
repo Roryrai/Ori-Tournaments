@@ -1,15 +1,14 @@
 from flask import request
 from flask import abort
 from flask_restful import Resource
-from flask_jwt import jwt_required
-from flask_jwt import current_identity
+from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_optional
 from sqlalchemy import or_
 from app import db
 
-
 from app.models import User
 from app.schemas import UserSchema
-
+from app.auth import Auth
 
 class UserResource(Resource):
     schema = UserSchema()
@@ -67,19 +66,25 @@ class UserResource(Resource):
 
     # Updates a user
     @jwt_required
-    def post(self):
+    def put(self):
         data = request.get_json()
         new = self.schema.load(data)
+        if new.id is not Auth.get_current_user().id:
+            abort(401)
         existing = User.query.get(new.id)
         if existing is not None:
             db.session.delete(existing)
             db.session.add(new)
+            db.session.commit()
             return
         else:
             abort(404)
 
-    # Creates a new user
-    def put(self):
+    # Creates a new user. Must not be logged in.
+    @jwt_optional
+    def post(self):
+        if Auth.get_current_user() is not None:
+            abort(405)
         data = request.get_json()
         user = self.schema.load(data)
         db.session.add(user)
@@ -87,8 +92,12 @@ class UserResource(Resource):
         return self.schema.dump(user), 201
 
     # Deletes a user
+    @Auth.role_organizer
     def delete(self):
-        user = User.query.get(request.args["id"])
+        # if not Auth.get_current_user().is_organizer():
+        #     abort(405)
+        return "rest of method"
+        user = User.query.get(request.args.get("id"))
         if user is not None:
             db.session.delete(user)
             db.session.commit()
