@@ -10,14 +10,14 @@ from app.schemas import TournamentSchema
 class TournamentResource(Resource):
     schema = TournamentSchema()
 
-    # Returns a tournament
+    # Queries tournaments
     def get(self):
         tournament = Tournament.query.get(request.args["id"])
         json = self.schema.dump(tournament)
         return json
 
     # Updates a tournament
-    def post(self):
+    def put(self):
         data = request.get_json()
         new = self.schema.load(data)
         existing = Tournament.query.get(new.id)
@@ -30,7 +30,7 @@ class TournamentResource(Resource):
             abort(404)
 
     # Creates a tournament
-    def put(self):
+    def post(self):
         data = request.get_json()
         tournament = self.load(data)
         db.session.add(tournament)

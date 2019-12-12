@@ -16,25 +16,25 @@ class UserResource(Resource):
 
     # Queries users based on request parameters
     def get(self):
-
-        if "id" in request.args and len(request.args) is not 1:
+        args = request.args
+        print(args)
+        if "id" in args and len(args) is not 1:
             return "'id' parameter may not be used with other parameters", 400
 
-        user_id = request.args.get("id")
-        name = "%" + request.args.get("name") + "%" if "name" in request.args else None
-        organizer = request.args.get("organizer") == "true"
-        restream = request.args.get("restream") == "true"
-        commentary = request.args.get("commentary") == "true"
-        tracking = request.args.get("tracking") == "true"
+        user_id = args.get("id")
+        name = "%" + args.get("name") + "%" if "name" in args else None
+        organizer = args.get("organizer") == "true"
+        restream = args.get("restream") == "true"
+        commentary = args.get("commentary") == "true"
+        tracking = args.get("tracking") == "true"
 
-        sort = request.args.get("sort")
-        reverse = request.args.get("reverse") == "true"
+        sort = args.get("sort")
+        reverse = args.get("reverse") == "true"
 
         query = User.query
-        # Get a user by user id
+        # Get a user by user id. If this is present no other args are present.
         if user_id:
-            user = query.get(user_id)
-            return self.list_schema.dump([user])
+            query = query.filter(User.id == user_id)
 
         # Find all users who match the filter conditions in the parameters.
         # Filters are AND except for name filters which are OR
@@ -94,10 +94,7 @@ class UserResource(Resource):
     # Deletes a user
     @Auth.role_organizer
     def delete(self):
-        # if not Auth.get_current_user().is_organizer():
-        #     abort(405)
-        return "rest of method"
-        user = User.query.get(request.args.get("id"))
+        user = User.query.get(request.args["id"])
         if user is not None:
             db.session.delete(user)
             db.session.commit()

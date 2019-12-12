@@ -1,40 +1,51 @@
 from flask import request
 from flask import abort
 from flask_restful import Resource
+from flask_jwt_extended import jwt_required
 
 from app import db
 from app.models import Volunteer
-from app.schemas import VolunteerSchema
-
-schema = VolunteerSchema()
+from app.models import User
+from app.schemas import UserSchema
+from app.auth import Auth
 
 
 class VolunteerResource(Resource):
+    schema = UserSchema(many=True)
+
     # Returns a volunteer for a specific tournament if it exists
     def get(self):
         args = request.args
-        tournament_id = args["tournament_id"]
-        user_id = args["user_id"]
-        volunteer = Volunteer.query.filter_by(tournament_id=tournament_id, user_id=user_id).first()
-        if volunteer:
-            json = schema.dump(volunteer)
-            return json
-        else:
-            return
+        tournament_id = args.get("tournament_id")
+
+        # Build query
+        query = db.session.query(User).join(User.tournaments_volunteered)
+
+        if tournament_id:
+            query = query.filter(Volunteer.tournament_id == tournament_id)
+
+        volunteers = query.all()
+        return self.schema.dump(volunteers)
 
     # Adds a volunteer to a tournament (sign up for a tournament)
-    def put(self):
+    @jwt_required
+    def post(self):
         data = request.get_json()
-        volunteer = schema.load(data)
-        db.session.add(volunteer)
+        entrant = Volunteer(tournament_id=data.get("tournament_id"), \
+                            user_id=Auth.get_current_user().id)
+        db.session.add(entrant)
         db.session.commit()
-        return schema.dump(volunteer), 201
+        return None, 201
 
-    # Deletes a volunteer from a tournament (cancels registration)
+    # Deletes an entrant from a tournament (cancels registration)
+    @jwt_required
     def delete(self):
-        tournament_id = request.args["tournament_id"]
-        user_id = request.args["user_id"]
-        print(tournament_id, user_id)
+        tournament_id = request.args.get("tournament_id")
+        user_id = request.args.get("user_id")
+        if user_id is None:
+            user_id = Auth.get_current_user().id
+        if not Auth.is_current_user_or_organizer(user_id):
+            abort(401)
         volunteer = Volunteer.query.filter_by(tournament_id=tournament_id, user_id=user_id).first()
         if volunteer is not None:
             db.session.delete(volunteer)
