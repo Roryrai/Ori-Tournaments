@@ -21,7 +21,7 @@ class UserResource(Resource):
         if "id" in request.args and len(request.args) is not 1:
             return "'id' parameter may not be used with other parameters", 400
 
-        id = request.args.get("id")
+        user_id = request.args.get("id")
         name = "%" + request.args.get("name") + "%" if "name" in request.args else None
         organizer = request.args.get("organizer") == "true"
         restream = request.args.get("restream") == "true"
@@ -34,14 +34,14 @@ class UserResource(Resource):
         print(sort)
         query = User.query
         # Get a user by user id
-        if id:
-            user = query.get(id)
+        if user_id:
+            user = query.get(user_id)
             return self.schema.dump(user)
 
         # Find all users who match the filter conditions in the parameters.
         # Filters are AND except for name filters which are OR
         if name:
-            filters = []
+            filters = list()
             filters.append(User.username.like(name))
             filters.append(User.discord_name.like(name))
             filters.append(User.twitch_name.like(name))
