@@ -6,6 +6,9 @@ from app.models import User
 
 
 class UserSchema(Schema):
+    class Meta():
+        ordered = True
+    
     id = fields.Int()
     username = fields.Str()
     discord_name = fields.Str()

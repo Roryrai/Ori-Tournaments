@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -16,3 +17,6 @@ class Config(object):
 
     # Secret key config
     SECRET_KEY = os.environ.get("SECRET_KEY")
+
+    JWT_AUTH_HEADER_PREFIX = os.environ.get("JWT_AUTH_HEADER_PREFIX")
+    JWT_EXPIRATION_DELTA = timedelta(seconds=int(os.environ.get("JWT_EXPIRATION_DELTA")))
