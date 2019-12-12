@@ -31,12 +31,11 @@ class UserResource(Resource):
         sort = request.args.get("sort")
         reverse = request.args.get("reverse") == "true"
 
-        print(sort)
         query = User.query
         # Get a user by user id
         if user_id:
             user = query.get(user_id)
-            return self.schema.dump(user)
+            return self.list_schema.dump([user])
 
         # Find all users who match the filter conditions in the parameters.
         # Filters are AND except for name filters which are OR
