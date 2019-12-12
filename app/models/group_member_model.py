@@ -1,9 +1,14 @@
+from sqlalchemy import UniqueConstraint
+
 from app import db
 
 
 # Association table for putting runners into groups
-class Group(db.Model):
+class GroupMember(db.Model):
     __tablename__ = "runner_groups"
+    __table_args__ = (UniqueConstraint("user_id",
+                                       "tournament_id",
+                                       name="unique_tournament_group_constraint"),)
 
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     tournament_id = db.Column(db.Integer, db.ForeignKey("tournaments.id"), nullable=False)

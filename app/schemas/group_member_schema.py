@@ -2,10 +2,10 @@ from marshmallow import Schema
 from marshmallow import fields
 from marshmallow import post_load
 
-from app.models import Group
+from app.models import GroupMember
 
 
-class GroupSchema(Schema):
+class GroupMemberSchema(Schema):
     id = fields.Int()
     tournament_id = fields.Int()
     user_id = fields.Int()
@@ -13,4 +13,4 @@ class GroupSchema(Schema):
 
     @post_load
     def make_group(self, data, **kwargs):
-        return Group(**data)
+        return GroupMember(**data)

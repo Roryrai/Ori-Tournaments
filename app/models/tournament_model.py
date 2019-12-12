@@ -19,7 +19,7 @@ class Tournament(db.Model):
     questions = db.relationship("Question", back_populates="tournament", lazy="dynamic")
     bracket_nodes = db.relationship("BracketNode", back_populates="tournament", lazy="dynamic")
     races = db.relationship("Race", back_populates="tournament", lazy="dynamic")
-    groups = db.relationship("Group", back_populates="tournament", lazy="dynamic")
+    groups = db.relationship("GroupMember", back_populates="tournament", lazy="dynamic")
     seeds = db.relationship("RunnerSeed", back_populates="tournament", lazy="dynamic")
     entrants = db.relationship("Entrant", back_populates="tournament", lazy="dynamic")
     volunteers = db.relationship("Volunteer", back_populates="tournament", lazy="dynamic")
