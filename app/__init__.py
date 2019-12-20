@@ -12,7 +12,7 @@ from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
 
-# Initialize extentions
+# Initialize extensions
 app.config.from_object(Config)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
@@ -28,10 +28,10 @@ app.register_blueprint(models_bp)
 app.register_blueprint(schemas_bp)
 
 # Authentication setup
-# from app.auth import authenticate
-# from app.auth import identity
+# from app.security import authenticate
+# from app.security import identity
 jwt = JWTManager(app)
-from app.auth import bp as auth_bp
+from app.security import bp as auth_bp
 app.register_blueprint(auth_bp)
 # Initialize API
 from app.api import bp as api_bp

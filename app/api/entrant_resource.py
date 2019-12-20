@@ -7,7 +7,7 @@ from app import db
 from app.models import Entrant
 from app.models import User
 from app.schemas import UserSchema
-from app.auth import Auth
+from app.security import Security
 
 
 class EntrantResource(Resource):
@@ -31,8 +31,8 @@ class EntrantResource(Resource):
     @jwt_required
     def post(self):
         data = request.get_json()
-        entrant = Entrant(tournament_id=data.get("tournament_id"), \
-                            user_id=Auth.get_current_user().id)
+        entrant = Entrant(tournament_id=data.get("tournament_id"),
+                          user_id=Security.get_current_user().id)
         db.session.add(entrant)
         db.session.commit()
         return None, 201
@@ -43,8 +43,8 @@ class EntrantResource(Resource):
         tournament_id = request.args.get("tournament_id")
         user_id = request.args.get("user_id")
         if user_id is None:
-            user_id = Auth.get_current_user().id
-        if not Auth.is_current_user_or_organizer(user_id):
+            user_id = Security.get_current_user().id
+        if not Security.is_current_user_or_organizer(user_id):
             abort(401)
         entrant = Entrant.query.filter_by(tournament_id=tournament_id, user_id=user_id).first()
         if entrant is not None:

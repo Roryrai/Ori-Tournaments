@@ -7,7 +7,7 @@ from app import db
 from app.models import Volunteer
 from app.models import User
 from app.schemas import UserSchema
-from app.auth import Auth
+from app.security import Security
 
 
 class VolunteerResource(Resource):
@@ -32,7 +32,7 @@ class VolunteerResource(Resource):
     def post(self):
         data = request.get_json()
         entrant = Volunteer(tournament_id=data.get("tournament_id"), \
-                            user_id=Auth.get_current_user().id)
+                            user_id=Security.get_current_user().id)
         db.session.add(entrant)
         db.session.commit()
         return None, 201
@@ -43,8 +43,8 @@ class VolunteerResource(Resource):
         tournament_id = request.args.get("tournament_id")
         user_id = request.args.get("user_id")
         if user_id is None:
-            user_id = Auth.get_current_user().id
-        if not Auth.is_current_user_or_organizer(user_id):
+            user_id = Security.get_current_user().id
+        if not Security.is_current_user_or_organizer(user_id):
             abort(401)
         volunteer = Volunteer.query.filter_by(tournament_id=tournament_id, user_id=user_id).first()
         if volunteer is not None:

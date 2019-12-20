@@ -4,9 +4,7 @@ from flask_restful import Resource
 from app.models import User
 
 
-
 class AuthResource(Resource):
-
     def post(self):
         json = request.get_json()
         user = User.query.filter_by(username=json["username"]).first()

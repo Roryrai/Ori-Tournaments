@@ -8,7 +8,9 @@ from app import db
 
 from app.models import User
 from app.schemas import UserSchema
-from app.auth import Auth
+from app.security import Security
+from app.security import role_organizer
+
 
 class UserResource(Resource):
     schema = UserSchema()
@@ -17,12 +19,13 @@ class UserResource(Resource):
     # Queries users based on request parameters
     def get(self):
         args = request.args
-        print(args)
         if "id" in args and len(args) is not 1:
             return "'id' parameter may not be used with other parameters", 400
 
         user_id = args.get("id")
-        name = "%" + args.get("name") + "%" if "name" in args else None
+        name = args.get("name")
+        if name:
+            name = "%" + name + "%"
         organizer = args.get("organizer") == "true"
         restream = args.get("restream") == "true"
         commentary = args.get("commentary") == "true"
@@ -64,12 +67,23 @@ class UserResource(Resource):
             users.sort(key=lambda x: x.id, reverse=reverse)
         return self.list_schema.dump(users)
 
+    # Creates a new user. Must not be logged in.
+    @jwt_optional
+    def post(self):
+        if Security.get_current_user() is not None:
+            abort(405)
+        data = request.get_json()
+        user = self.schema.load(data)
+        db.session.add(user)
+        db.session.commit()
+        return self.schema.dump(user), 201
+
     # Updates a user
     @jwt_required
     def put(self):
         data = request.get_json()
         new = self.schema.load(data)
-        if new.id is not Auth.get_current_user().id:
+        if new.id is not Security.get_current_user().id:
             abort(401)
         existing = User.query.get(new.id)
         if existing is not None:
@@ -80,21 +94,10 @@ class UserResource(Resource):
         else:
             abort(404)
 
-    # Creates a new user. Must not be logged in.
-    @jwt_optional
-    def post(self):
-        if Auth.get_current_user() is not None:
-            abort(405)
-        data = request.get_json()
-        user = self.schema.load(data)
-        db.session.add(user)
-        db.session.commit()
-        return self.schema.dump(user), 201
-
     # Deletes a user
-    @Auth.role_organizer
+    @role_organizer
     def delete(self):
-        user = User.query.get(request.args["id"])
+        user = User.query.get(request.args.get("id"))
         if user is not None:
             db.session.delete(user)
             db.session.commit()

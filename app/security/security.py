@@ -8,7 +8,6 @@ from app.models import User
 
 
 # Custom decorator that ensures a user is an organizer
-@staticmethod
 def role_organizer(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
