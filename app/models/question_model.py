@@ -3,10 +3,10 @@ from app import db
 
 # Tournament specific questions
 class Question(db.Model):
-    __tablename__ = "questions"
+    __tablename__ = "question"
 
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    tournament_id = db.Column(db.Integer, db.ForeignKey("tournaments.id"), nullable=False)
+    tournament_id = db.Column(db.Integer, db.ForeignKey("tournament.id"), nullable=False)
     question = db.Column(db.String(120), nullable=False)
 
     responses = db.relationship("Response", back_populates="question", lazy="dynamic")

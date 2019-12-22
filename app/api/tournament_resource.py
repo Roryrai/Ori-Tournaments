@@ -43,20 +43,24 @@ class TournamentResource(Resource):
             query = query.filter(Tournament.name.like(name))
         if category:
             query = query.filter(Tournament.category.like(category))
-        if not (Security.get_current_user() and Security.get_current_user().is_organizer()) and hidden:
+        if not (Security.get_current_user() and Security.get_current_user().is_organizer()):
             query = query.filter(Tournament.visible)
         elif hidden:
             query = query.filter(Tournament.visible)
         if active:
             query = query.filter(Tournament.active)
 
+        # Sorting logic. Default sort is by id for now.
+        order = Tournament.id
+        if sort == "name":
+            order = Tournament.name
+        if sort == "category":
+            order = Tournament.category
+        if reverse:
+            order = order.desc()
+        query = query.order_by(order)
         tournaments = query.all()
 
-        # Default sort is by id for now. Should probably be by something else.
-        if sort is None or sort == "id":
-            tournaments.sort(key=lambda x: x.id, reverse=reverse)
-        elif sort == "name":
-            tournaments.sort(key=lambda x: x.id, reverse=reverse)
         return self.list_schema.dump(tournaments)
 
     # Creates a tournament

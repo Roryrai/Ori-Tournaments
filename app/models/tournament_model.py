@@ -4,7 +4,7 @@ from datetime import datetime
 
 # Top-level tournament object. Most things are accessible from somewhere in here
 class Tournament(db.Model):
-    __tablename__ = "tournaments"
+    __tablename__ = "tournament"
 
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     category = db.Column(db.String(60), nullable=False)
@@ -12,7 +12,7 @@ class Tournament(db.Model):
     end_date = db.Column(db.DateTime())
     signups_open = db.Column(db.DateTime())
     signups_close = db.Column(db.DateTime())
-    visible = db.Column(db.Boolean, nullable=False)
+    hidden = db.Column(db.Boolean, nullable=False)
     name = db.Column(db.String(60))
     active = db.Column(db.Boolean, default=False)
 

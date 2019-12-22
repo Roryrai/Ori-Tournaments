@@ -3,7 +3,7 @@ from app import db
 
 # Group names for group stage tournaments.
 class GroupName(db.Model):
-    __tablename__ = "group_names"
+    __tablename__ = "group_name"
 
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     group_name = db.Column(db.String(60), nullable=False)

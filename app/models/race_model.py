@@ -4,13 +4,13 @@ from datetime import datetime
 
 # Races
 class Race(db.Model):
-    __tablename__ = "races"
+    __tablename__ = "race"
 
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     number_entrants = db.Column(db.Integer, nullable=False)
-    tournament_id = db.Column(db.Integer, db.ForeignKey("tournaments.id"), nullable=False)
-    bracket_id = db.Column(db.Integer, db.ForeignKey("bracket.id"))
+    tournament_id = db.Column(db.Integer, db.ForeignKey("tournament.id"), nullable=False)
+    bracket_id = db.Column(db.Integer, db.ForeignKey("bracket_node.id"))
     comments = db.Column(db.String(500))
 
     tournament = db.relationship("Tournament", back_populates="races", uselist=False)

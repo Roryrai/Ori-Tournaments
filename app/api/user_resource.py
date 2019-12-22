@@ -58,13 +58,15 @@ class UserResource(Resource):
         if tracking:
             query = query.filter(User.tracking)
 
+        # Sorting logic. Default sort is alphabetical by username. Can also sort by user id right now.
+        order = User.username
+        if sort == "id":
+            order = User.id
+        if reverse:
+            order = order.desc()
+        query = query.order_by(order)
         users = query.all()
 
-        # Default sort is alphabetical by username. May add other sorts later?
-        if sort is None or sort == "name":
-            users.sort(key=lambda x: x.username, reverse=reverse)
-        elif sort == "id":
-            users.sort(key=lambda x: x.id, reverse=reverse)
         return self.list_schema.dump(users)
 
     # Creates a new user. Must not be logged in.
