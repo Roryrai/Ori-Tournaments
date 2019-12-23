@@ -44,9 +44,9 @@ class TournamentResource(Resource):
         if category:
             query = query.filter(Tournament.category.like(category))
         if not (Security.get_current_user() and Security.get_current_user().is_organizer()):
-            query = query.filter(Tournament.visible)
+            query = query.filter(not Tournament.hidden)
         elif hidden:
-            query = query.filter(Tournament.visible)
+            query = query.filter(Tournament.hidden)
         if active:
             query = query.filter(Tournament.active)
 

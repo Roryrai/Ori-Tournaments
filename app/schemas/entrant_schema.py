@@ -6,6 +6,9 @@ from app.models import Entrant
 
 
 class EntrantSchema(Schema):
+    class Meta:
+        ordered = True
+
     id = fields.Int()
     user_id = fields.Int()
     tournament_id = fields.Int()

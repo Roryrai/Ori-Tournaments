@@ -4,7 +4,11 @@ from marshmallow import post_load
 
 from app.models import Race
 
+
 class RaceSchema(Schema):
+    class Meta:
+        ordered = True
+
     id = fields.Int()
     date = fields.Date()
     number_entrants = fields.Int()

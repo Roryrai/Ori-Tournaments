@@ -6,7 +6,7 @@ from app.models import User
 
 
 class UserSchema(Schema):
-    class Meta():
+    class Meta:
         ordered = True
     
     id = fields.Int()

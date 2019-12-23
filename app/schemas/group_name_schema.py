@@ -6,6 +6,9 @@ from app.models import GroupName
 
 
 class GroupNameSchema(Schema):
+    class Meta:
+        ordered = True
+
     id = fields.Int()
     group_name = fields.Str()
 

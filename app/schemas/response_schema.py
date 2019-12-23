@@ -6,6 +6,9 @@ from app.models import Response
 
 
 class ResponseSchema(Schema):
+    class Meta:
+        ordered = True
+
     id = fields.Int()
     question_id = fields.Int()
     user_id = fields.Int()

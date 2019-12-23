@@ -6,6 +6,9 @@ from app.models import GroupMember
 
 
 class GroupMemberSchema(Schema):
+    class Meta:
+        ordered = True
+
     id = fields.Int()
     tournament_id = fields.Int()
     user_id = fields.Int()

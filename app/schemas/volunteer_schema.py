@@ -6,6 +6,9 @@ from app.models import Volunteer
 
 
 class VolunteerSchema(Schema):
+    class Meta:
+        ordered = True
+
     id = fields.Int()
     user_id = fields.Int()
     tournament_id = fields.Int()
@@ -13,4 +16,3 @@ class VolunteerSchema(Schema):
     @post_load
     def make_volunteer(self, data, **kwargs):
         return Volunteer(**data)
-

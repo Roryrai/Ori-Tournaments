@@ -6,6 +6,9 @@ from app.models import RaceResult
 
 
 class RaceResultSchema(Schema):
+    class Meta:
+        ordered = True
+
     id = fields.Int()
     race_id = fields.Int()
     user_id = fields.Int()
