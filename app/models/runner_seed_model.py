@@ -2,6 +2,7 @@ from app import db
 
 
 # Association table for giving runners a seed
+# Currently unused
 class RunnerSeed(db.Model):
     __tablename__ = "runner_seed"
 

@@ -3,7 +3,7 @@ from app import db
 
 # Association table for putting runners into tournaments
 class Entrant(db.Model):
-    __tablename__ = "tournament_entrants"
+    __tablename__ = "tournament_entrant"
 
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)

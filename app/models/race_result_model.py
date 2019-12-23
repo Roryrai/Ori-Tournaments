@@ -2,6 +2,7 @@ from app import db
 
 
 # Association table between races and users who participated in those races
+# Each record holds a single runner's time and a reference to the race it happened in
 class RaceResult(db.Model):
     __tablename__ = "race_result"
 
