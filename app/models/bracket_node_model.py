@@ -1,6 +1,6 @@
 from app import db
 from sqlalchemy_utils import LtreeType
-
+from datetime import datetime
 
 # Each BracketNode represents a single point in the bracket.
 # Two BracketNodes are a match
@@ -14,7 +14,9 @@ class BracketNode(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     tournament_id = db.Column(db.Integer, db.ForeignKey("tournament.id"), nullable=False)
     best_of = db.Column(db.Integer)
-
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+    date_modified = db.Column(db.DateTime, default=datetime.utcnow)
+    
     races = db.relationship("Race", back_populates="bracket_node")
     tournament = db.relationship("Tournament", back_populates="bracket_nodes", uselist=False)
     user = db.relationship("User", back_populates="bracket_nodes", uselist=False)

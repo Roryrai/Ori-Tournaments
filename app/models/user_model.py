@@ -26,7 +26,8 @@ class User(UserMixin, db.Model):
     pronunciation = db.Column(db.String(60))
     pronouns = db.Column(db.String(10), nullable=False)
     about = db.Column(db.String(500))
-    timestamp = db.Column(db.DateTime(), default=datetime.utcnow, nullable=False)
+    date_created = db.Column(db.DateTime(), default=datetime.utcnow, nullable=False)
+    date_modified = db.Column(db.DateTime(), default = datetime.utcnow, nullable=False)
     password_hash = db.Column(db.String(128))
     salt = db.Column(db.String(32))
     organizer = db.Column(db.Boolean, default=False)
@@ -40,6 +41,7 @@ class User(UserMixin, db.Model):
     restream = db.Column(db.Boolean, default=False)
     commentary = db.Column(db.Boolean, default=False)
     tracking = db.Column(db.Boolean, default=False)
+
 
     question_responses = db.relationship("Response", back_populates="user", lazy="dynamic")
     bracket_nodes = db.relationship("BracketNode", back_populates="user", lazy="dynamic")

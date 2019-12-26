@@ -15,6 +15,8 @@ class Tournament(db.Model):
     hidden = db.Column(db.Boolean, nullable=False)
     name = db.Column(db.String(60))
     active = db.Column(db.Boolean, default=False)
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+    date_modified = db.Column(db.DateTime, default=datetime.utcnow)
 
     questions = db.relationship("Question", back_populates="tournament", lazy="dynamic")
     bracket_nodes = db.relationship("BracketNode", back_populates="tournament", lazy="dynamic")

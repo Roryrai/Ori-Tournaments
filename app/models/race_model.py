@@ -12,6 +12,7 @@ class Race(db.Model):
     tournament_id = db.Column(db.Integer, db.ForeignKey("tournament.id"), nullable=False)
     bracket_id = db.Column(db.Integer, db.ForeignKey("bracket_node.id"))
     comments = db.Column(db.String(500))
+    date_modified = db.Column(db.DateTime, default=datetime.utcnow)
 
     tournament = db.relationship("Tournament", back_populates="races", uselist=False)
     bracket_node = db.relationship("BracketNode", back_populates="races", uselist=False)

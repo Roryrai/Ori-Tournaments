@@ -1,5 +1,5 @@
 from sqlalchemy import UniqueConstraint
-
+from datetime import datetime
 from app import db
 
 
@@ -14,7 +14,8 @@ class GroupMember(db.Model):
     tournament_id = db.Column(db.Integer, db.ForeignKey("tournament.id"), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     group_id = db.Column(db.Integer, db.ForeignKey("group_name.id"), nullable=False)
-
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+    
     tournament = db.relationship("Tournament", back_populates="groups")
     user = db.relationship("User", back_populates="groups")
     group = db.relationship("GroupName", back_populates="runner_groups")

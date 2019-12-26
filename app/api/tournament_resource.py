@@ -67,7 +67,7 @@ class TournamentResource(Resource):
     @role_organizer
     def post(self):
         data = request.get_json()
-        tournament = self.load(data)
+        tournament = self.schema.load(data)
         db.session.add(tournament)
         db.session.commit()
         return self.schema.dump(tournament), 201
