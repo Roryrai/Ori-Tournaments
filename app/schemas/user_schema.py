@@ -8,14 +8,16 @@ from app.models import User
 class UserSchema(Schema):
     class Meta:
         ordered = True
-    
+
     id = fields.Int()
     username = fields.Str()
     discord_name = fields.Str()
     pronunciation = fields.Str()
     pronouns = fields.Str()
+    # password = fields.Method(deserialize="User.set_password")
     about = fields.Str()
-    timestamp = fields.DateTime()
+    date_created = fields.DateTime()
+    date_modified = fields.DateTime()
     is_organizer = fields.Bool()
     srl_name = fields.Str()
     twitch_name = fields.Str()

@@ -43,11 +43,11 @@ class UserResource(Resource):
         # Filters are AND except for name filters which are OR
         if name:
             filters = list()
-            filters.append(User.username.like(name))
-            filters.append(User.discord_name.like(name))
-            filters.append(User.twitch_name.like(name))
-            filters.append(User.srl_name.like(name))
-            filters.append(User.src_name.like(name))
+            filters.append(User.username.ilike(name))
+            filters.append(User.discord_name.ilike(name))
+            filters.append(User.twitch_name.ilike(name))
+            filters.append(User.srl_name.ilike(name))
+            filters.append(User.src_name.ilike(name))
             query = query.filter(or_(*filters))
         if organizer:
             query = query.filter(User.organizer)
@@ -76,6 +76,7 @@ class UserResource(Resource):
             abort(405)
         data = request.get_json()
         user = self.schema.load(data)
+        
         db.session.add(user)
         db.session.commit()
         return self.schema.dump(user), 201
@@ -89,9 +90,19 @@ class UserResource(Resource):
             abort(401)
         existing = User.query.get(new.id)
         if existing is not None:
-            db.session.delete(existing)
-            db.session.add(new)
-            db.session.commit()
+            existing.username = new.username
+            existing.discord_name = new.discord_name
+            existing.pronunciation = new.pronunciation
+            existing.pronouns = new.pronouns
+            existing.about = new.about
+            existing.sql_name = new.srl_name
+            existing.twitch_name = new.twitch_name
+            existing.src_name = new.src_name
+            existing.input_method = new.input_method
+            existing.restream = new.restream
+            existing.commentary = new.commentary
+            existing.tracking = new.tracking
+            existing.date_modified = datetime.utcnow()
             return
         else:
             abort(404)
