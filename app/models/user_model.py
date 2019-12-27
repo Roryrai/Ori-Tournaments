@@ -21,7 +21,7 @@ class User(UserMixin, db.Model):
     __tablename__ = "user"
 
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    username = db.Column(db.String(60), nullable=False)
+    username = db.Column(db.String(60), nullable=False, unique=True)
     discord_name = db.Column(db.String(60), nullable=False)
     pronunciation = db.Column(db.String(60))
     pronouns = db.Column(db.String(10), nullable=False)

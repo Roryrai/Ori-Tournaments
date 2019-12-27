@@ -3,6 +3,7 @@ from flask import abort
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import jwt_optional
+from sqlalchemy import exc
 from sqlalchemy import or_
 from app import db
 
@@ -75,10 +76,20 @@ class UserResource(Resource):
         if Security.get_current_user() is not None:
             abort(405)
         data = request.get_json()
+        password = data["password"]
+        print(password)
+        try:
+            del data["password"]
+        except KeyError:
+            abort(400)
         user = self.schema.load(data)
-        
-        db.session.add(user)
-        db.session.commit()
+        user.set_password(password)
+        try:
+            db.session.add(user)
+            db.session.commit()
+        except exc.IntegrityError as e:
+            db.session.rollback()
+            return "That username is taken", 500
         return self.schema.dump(user), 201
 
     # Updates a user
