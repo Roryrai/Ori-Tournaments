@@ -97,7 +97,7 @@ class UserResource(Resource):
         print(user_data)
         new_data = self.schema.load(user_data)
         current_id = Security.get_current_user().id
-        if new.id is not current_id:
+        if new_data.id is not current_id:
             abort(401)
         user = User.query.get(current_id)
         if user is not None:
