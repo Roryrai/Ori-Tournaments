@@ -2,6 +2,7 @@ from flask import request
 from flask import abort
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required
+from sqlalchemy.exc import IntegrityError
 
 from app import db
 from app.models import Entrant
@@ -31,10 +32,14 @@ class EntrantResource(Resource):
     @jwt_required
     def post(self):
         data = request.get_json()
-        entrant = Entrant(tournament_id=data.get("tournament_id"),
+        try:
+            entrant = Entrant(tournament_id=data.get("tournament_id"),
                           user_id=Security.get_current_user().id)
-        db.session.add(entrant)
-        db.session.commit()
+            db.session.add(entrant)
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return "You've already signed up for this event"
         return None, 201
 
     # Deletes an entrant from a tournament (cancels registration)

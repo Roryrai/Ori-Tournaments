@@ -3,7 +3,7 @@ from flask import abort
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import jwt_optional
-from sqlalchemy import exc
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
 from app import db
 
@@ -12,6 +12,7 @@ from app.schemas import UserSchema
 from app.security import Security
 from app.security import role_organizer
 
+from datetime import datetime
 
 class UserResource(Resource):
     schema = UserSchema()
@@ -76,18 +77,13 @@ class UserResource(Resource):
         if Security.get_current_user() is not None:
             abort(405)
         data = request.get_json()
-        password = data["password"]
-        print(password)
-        try:
-            del data["password"]
-        except KeyError:
-            abort(400)
-        user = self.schema.load(data)
-        user.set_password(password)
+        user_data = data["user"]
+        user = self.schema.load(user_data)
+        user.set_password(data["password"])
         try:
             db.session.add(user)
             db.session.commit()
-        except exc.IntegrityError as e:
+        except IntegrityError:
             db.session.rollback()
             return "That username is taken", 500
         return self.schema.dump(user), 201
@@ -96,24 +92,34 @@ class UserResource(Resource):
     @jwt_required
     def put(self):
         data = request.get_json()
-        new = self.schema.load(data)
-        if new.id is not Security.get_current_user().id:
+        print(data)
+        user_data = data["user"]
+        print(user_data)
+        new_data = self.schema.load(user_data)
+        current_id = Security.get_current_user().id
+        if new.id is not current_id:
             abort(401)
-        existing = User.query.get(new.id)
-        if existing is not None:
-            existing.username = new.username
-            existing.discord_name = new.discord_name
-            existing.pronunciation = new.pronunciation
-            existing.pronouns = new.pronouns
-            existing.about = new.about
-            existing.sql_name = new.srl_name
-            existing.twitch_name = new.twitch_name
-            existing.src_name = new.src_name
-            existing.input_method = new.input_method
-            existing.restream = new.restream
-            existing.commentary = new.commentary
-            existing.tracking = new.tracking
-            existing.date_modified = datetime.utcnow()
+        user = User.query.get(current_id)
+        if user is not None:
+            if "password" in data.keys():
+                if "old_password" in data.keys() and user.check_password(data["old_password"]):
+                    user.set_password(data["password"])
+                else:
+                    return "Current password is incorrect", 401
+            user.username = new_data.username
+            user.discord_name = new_data.discord_name
+            user.pronunciation = new_data.pronunciation
+            user.pronouns = new_data.pronouns
+            user.about = new_data.about
+            user.sql_name = new_data.srl_name
+            user.twitch_name = new_data.twitch_name
+            user.src_name = new_data.src_name
+            user.input_method = new_data.input_method
+            user.restream = new_data.restream
+            user.commentary = new_data.commentary
+            user.tracking = new_data.tracking
+            user.date_modified = datetime.utcnow()
+            db.session.commit()
             return
         else:
             abort(404)
