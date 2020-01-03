@@ -16,7 +16,7 @@ class Race(db.Model):
 
     tournament = db.relationship("Tournament", back_populates="races", uselist=False)
     bracket_node = db.relationship("BracketNode", back_populates="races", uselist=False)
-    results = db.relationship("RaceResult", back_populates="race", lazy="dynamic")
+    results = db.relationship("RaceResult", back_populates="race")
 
     def __repr__(self):
         return "<Race %s - entrants: %s, bracket: %s>" % (self.date, self.number_entrants, self.bracket_node)

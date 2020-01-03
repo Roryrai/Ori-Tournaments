@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import request
 from flask import abort
 from flask_restful import Resource
@@ -79,8 +80,14 @@ class TournamentResource(Resource):
         new = self.schema.load(data)
         existing = Tournament.query.get(new.id)
         if existing is not None:
-            db.session.delete(existing)
-            db.session.add(new)
+            existing.name = new.name
+            existing.category = new.category
+            existing.hidden = new.hidden
+            existing.start_date = new.start_date
+            existing.end_date = new.end_date
+            existing.signups_open = new.signups_open
+            existing.signups_close = new.signups_close
+            existing.date_modified = datetime.utcnow
             db.session.commit()
             return
         else:
@@ -89,7 +96,7 @@ class TournamentResource(Resource):
     # Deletes a tournament
     @role_organizer
     def delete(self):
-        tournament = Tournament.query.get(request.args["id"])
+        tournament = Tournament.query.get(request.args.get("id"))
         if tournament is not None:
             db.session.delete(tournament)
             db.session.commit()
