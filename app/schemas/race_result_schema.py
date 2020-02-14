@@ -3,6 +3,7 @@ from marshmallow import fields
 from marshmallow import post_load
 
 from app.models import RaceResult
+from app.schemas import UserSchema
 
 
 class RaceResultSchema(Schema):
@@ -11,7 +12,7 @@ class RaceResultSchema(Schema):
 
     id = fields.Int()
     race_id = fields.Int()
-    user_id = fields.Int()
+    runner = fields.Pluck(UserSchema, "username", attribute="user")
     time = fields.TimeDelta()
     comments = fields.Str()
 

@@ -52,8 +52,6 @@ class RaceResource(Resource):
             order = order.desc()
         query = query.order_by(order)
         races = query.all()
-        for race in races:
-            print(race.results)
         return self.list_schema.dump(races)
 
     # Create a race

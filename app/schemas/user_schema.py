@@ -14,7 +14,6 @@ class UserSchema(Schema):
     discord_name = fields.Str()
     pronunciation = fields.Str()
     pronouns = fields.Str()
-    # password = fields.Method(deserialize="User.set_password")
     about = fields.Str()
     date_created = fields.DateTime()
     date_modified = fields.DateTime()

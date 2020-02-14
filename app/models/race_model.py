@@ -1,5 +1,6 @@
 from app import db
 from datetime import datetime
+from sqlalchemy.ext.orderinglist import ordering_list
 
 
 # Races
@@ -16,7 +17,7 @@ class Race(db.Model):
 
     tournament = db.relationship("Tournament", back_populates="races", uselist=False)
     bracket_node = db.relationship("BracketNode", back_populates="races", uselist=False)
-    results = db.relationship("RaceResult", back_populates="race")
+    results = db.relationship("RaceResult", back_populates="race", order_by="RaceResult.time", collection_class=ordering_list("time"))
 
     def __repr__(self):
         return "<Race %s - entrants: %s, bracket: %s>" % (self.date, self.number_entrants, self.bracket_node)

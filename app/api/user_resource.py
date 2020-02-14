@@ -92,9 +92,7 @@ class UserResource(Resource):
     @jwt_required
     def put(self):
         data = request.get_json()
-        print(data)
         user_data = data["user"]
-        print(user_data)
         new_data = self.schema.load(user_data)
         current_id = Security.get_current_user().id
         if new_data.id is not current_id:
