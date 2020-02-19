@@ -9,5 +9,6 @@ from .group_member_schema import GroupMemberSchema
 from .tournament_schema import TournamentSchema
 from .volunteer_schema import VolunteerSchema
 from .group_name_schema import GroupNameSchema
+from .question_schema import QuestionSchema
 
 bp = Blueprint("schemas", __name__)

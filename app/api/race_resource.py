@@ -3,6 +3,8 @@ from flask import request
 from flask import abort
 from flask_restful import Resource
 from flask_jwt_extended import jwt_optional
+from sqlalchemy import Date
+from sqlalchemy import cast
 
 from app import db
 from app.models import Race
@@ -41,7 +43,8 @@ class RaceResource(Resource):
             query = query.filter(Race.tournament_id == tournament_id)
         if bracket_id:
             query = query.filter(Race.bracket_id == bracket_id)
-
+        if date:
+            query = query.filter(cast(Race.date, Date) == date)
         # Sorting logic Default sort by date desc
         order = Race.date.desc()
         if sort == "date":
@@ -51,6 +54,8 @@ class RaceResource(Resource):
         if reverse:
             order = order.desc()
         query = query.order_by(order)
+
+        print(str(query))
         races = query.all()
         return self.list_schema.dump(races)
 
@@ -69,7 +74,7 @@ class RaceResource(Resource):
         new = self.schema.load(data)
         existing = Race.query.get(new.id)
         if existing is not None:
-            existing.date = new.date
+            # existing.date = new.date
             existing.number_entrants = new.number_entrants
             existing.tournament_id = new.tournament_id
             existing.bracket_id = new.bracket_id
