@@ -49,3 +49,38 @@ class QuestionResource(Resource):
         questions = query.all()
 
         return self.list_schema.dump(questions)
+
+    @role_organizer
+    def post(self):
+        data = request.get_json()
+        question = self.schema.load(data)
+        try:
+            db.session.add(question)
+            db.session.commit()
+        except:
+            db.session.rollback()
+        return self.schema.dump(question), 201
+
+    @role_organizer
+    def put(self):
+        data = request.get_json()
+        new_question = self.schema.load(data)
+        question = Question.query.get(new_question.id)
+        if question:
+            question.question = new_question.question
+            question.tournament_id = new_question.tournament_id
+            question.date_modified = datetime.utcnow()
+            db.session.commit()
+            return
+        else:
+            abort(404)
+
+    @role_organizer
+    def delete(self):
+        question = Question.query.get(request.args.get("id"))
+        if question:
+            db.session.delete(question)
+            db.session.commit()
+            return
+        else:
+            abort(404)

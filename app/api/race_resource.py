@@ -5,6 +5,7 @@ from flask_restful import Resource
 from flask_jwt_extended import jwt_optional
 from sqlalchemy import Date
 from sqlalchemy import cast
+# from sqlalchemy import _in
 
 from app import db
 from app.models import Race
@@ -29,10 +30,12 @@ class RaceResource(Resource):
         date = args.get("date")
         tournament_id = args.get("tournament_id")
         bracket_id = args.get("bracket_id")
+        runners = args.get("runner").split(",")
+        print(runners)
         sort = args.get("sort")
         reverse = args.get("reverse") == "true"
 
-        query = Race.query
+        query = db.session.query(Race).join(Race.results)
 
         # Get one by id
         if race_id:
@@ -45,6 +48,10 @@ class RaceResource(Resource):
             query = query.filter(Race.bracket_id == bracket_id)
         if date:
             query = query.filter(cast(Race.date, Date) == date)
+        if runners:
+            for runner in runners:
+                query = query.filter(RaceResult.user_id.in_(runner))
+
         # Sorting logic Default sort by date desc
         order = Race.date.desc()
         if sort == "date":
