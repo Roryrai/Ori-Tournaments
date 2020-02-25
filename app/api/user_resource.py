@@ -109,7 +109,7 @@ class UserResource(Resource):
             user.pronunciation = new_data.pronunciation
             user.pronouns = new_data.pronouns
             user.about = new_data.about
-            user.sql_name = new_data.srl_name
+            user.srl_name = new_data.srl_name
             user.twitch_name = new_data.twitch_name
             user.src_name = new_data.src_name
             user.input_method = new_data.input_method

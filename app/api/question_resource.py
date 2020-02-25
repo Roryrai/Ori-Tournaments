@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import request
 from flask import abort
 from flask_restful import Resource
-from flask_jwt_extended import jwt_optional
+from flask_jwt_extended import jwt_required
 
 from app import db
 from app.models import Question
@@ -14,7 +14,7 @@ class QuestionResource(Resource):
     schema = QuestionSchema()
     list_schema = QuestionSchema(many=True)
 
-    @jwt_optional
+    @jwt_required
     def get(self):
         args = request.args
         if "id" in args and len(args) is not 1:

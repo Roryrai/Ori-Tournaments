@@ -13,6 +13,9 @@ class QuestionSchema(Schema):
     tournament_id = fields.Int()
     question = fields.Str()
 
+    date_created = fields.Date()
+    date_modified = fields.Date()
+
     @post_load
     def make_question(self, data, **kwargs):
         return Question(**data)
