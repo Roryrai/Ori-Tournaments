@@ -13,4 +13,7 @@ from .tournament_schema import TournamentSchema
 from .volunteer_schema import VolunteerSchema
 from .group_name_schema import GroupNameSchema
 
+from .standings_schema import GroupStandingsSchema
+from .standings_schema import QualifierStandingsSchema
+
 bp = Blueprint("schemas", __name__)

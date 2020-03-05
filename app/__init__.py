@@ -24,8 +24,10 @@ marshmallow = Marshmallow(app)
 # Import models and schemas
 from app.models import bp as models_bp
 from app.schemas import bp as schemas_bp
+from app.services import bp as services_bp
 app.register_blueprint(models_bp)
 app.register_blueprint(schemas_bp)
+app.register_blueprint(services_bp)
 
 # Authentication setup
 # from app.security import authenticate

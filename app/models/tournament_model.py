@@ -6,6 +6,9 @@ from datetime import datetime
 class Tournament(db.Model):
     __tablename__ = "tournament"
 
+    group_format = "GROUP"
+    qualifier_format = "QUALIFIER"
+
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     category = db.Column(db.String(60), nullable=False)
     start_date = db.Column(db.DateTime())
@@ -15,6 +18,7 @@ class Tournament(db.Model):
     hidden = db.Column(db.Boolean, nullable=False)
     name = db.Column(db.String(60))
     active = db.Column(db.Boolean, default=False)
+    format = db.Column(db.String(10))
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
     date_modified = db.Column(db.DateTime, default=datetime.utcnow)
 

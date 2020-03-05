@@ -12,4 +12,7 @@ from .group_member_model import GroupMember
 from .runner_seed_model import RunnerSeed
 from .volunteer_model import Volunteer
 
+from .standings_model import QualifierStandings
+from .standings_model import GroupStandings
+
 bp = Blueprint("models", __name__)
