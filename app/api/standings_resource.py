@@ -30,10 +30,10 @@ class StandingsResource(Resource):
             if not Tournament:
                 return "Unable to find tournament", 404
             if tournament.format == Tournament.group_format:
-                standings = StandingsService.getGroupStandings(tournament)
+                standings = StandingsService.get_group_standings(tournament)
                 return self.group_schema.dump(standings)
             elif tournament.format == Tournament.qualifier_format:
-                standings = StandingsService.getQualifierStandings(tournament)
+                standings = StandingsService.get_qualifier_standings(tournament)
                 return self.qualifier_schema.dump(standings)
 
 

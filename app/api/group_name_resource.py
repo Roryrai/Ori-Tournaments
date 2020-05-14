@@ -42,7 +42,7 @@ class GroupNameResource(Resource):
         query = query.order_by(order)
         group_names = query.all()
 
-        return self.list_schema(group_names)
+        return self.list_schema.dump(group_names)
 
     # Creates a new group name. This is different from creating a new group.
     @role_organizer
@@ -59,8 +59,9 @@ class GroupNameResource(Resource):
         data = request.get_json()
         new = self.schema.load(data)
         existing = GroupName.query(new.id)
-        if existing is not None:
+        if existing:
             existing.group_name = new.group_name
+            db.session.commit()
             return
         else:
             abort(404)

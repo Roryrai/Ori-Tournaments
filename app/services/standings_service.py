@@ -8,7 +8,7 @@ from app.models import QualifierStandings
 class StandingsService():
 
     # Gets qualifier standings for a given tournament
-    def getQualifierStandings(tournament):
+    def get_qualifier_standings(tournament):
         statement = text("""
             SELECT x.tournament_id,
                 x.display_name,
@@ -59,7 +59,7 @@ class StandingsService():
         return standings
 
     # Retrieves the standings of a tournament formatted as group stage
-    def getGroupStandings(tournament):
+    def get_group_standings(tournament):
         statement = text("""
             SELECT COALESCE(winners.tournament_id, losers.tournament_id) AS tournament_id,
                 COALESCE(winners.group_name, losers.group_name) AS group_name,
