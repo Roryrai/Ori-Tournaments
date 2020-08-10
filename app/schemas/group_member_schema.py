@@ -5,6 +5,8 @@ from marshmallow import post_load
 from app.models import GroupMember
 from app.models import User
 from app.models import GroupName
+from app.schemas import UserSchema
+from app.schemas import GroupNameSchema
 
 
 class GroupMemberSchema(Schema):
@@ -13,7 +15,7 @@ class GroupMemberSchema(Schema):
 
     id = fields.Int()
     tournament_id = fields.Int()
-    runner = fields.Pluck(UserSchema, "username", attribute=user)
+    runner = fields.Pluck(UserSchema, "username", attribute="user")
     group_name= fields.Pluck(GroupNameSchema, "group_name", attribute="group")
 
     @post_load

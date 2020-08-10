@@ -24,7 +24,7 @@ class GroupNameResource(Resource):
         reverse = args.get("reverse") == "true"
 
         if name:
-            name = "%" name + "%"
+            name = "%" + name + "%"
 
         query = GroupName.query
 
